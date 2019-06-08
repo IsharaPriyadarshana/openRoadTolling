@@ -6121,17 +6121,17 @@
     },
     {
         "name": "symfony/twig-bundle",
-        "version": "v4.3.0",
-        "version_normalized": "4.3.0.0",
+        "version": "v4.3.1",
+        "version_normalized": "4.3.1.0",
         "source": {
             "type": "git",
             "url": "https://github.com/symfony/twig-bundle.git",
-            "reference": "2792936cbcd92267596363b67b5cebb5e347af59"
+            "reference": "b8e1c193a474b97b608de74fe0a01214678bfd89"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/symfony/twig-bundle/zipball/2792936cbcd92267596363b67b5cebb5e347af59",
-            "reference": "2792936cbcd92267596363b67b5cebb5e347af59",
+            "url": "https://api.github.com/repos/symfony/twig-bundle/zipball/b8e1c193a474b97b608de74fe0a01214678bfd89",
+            "reference": "b8e1c193a474b97b608de74fe0a01214678bfd89",
             "shasum": ""
         },
         "require": {
@@ -6164,7 +6164,7 @@
             "symfony/web-link": "~3.4|~4.0",
             "symfony/yaml": "~3.4|~4.0"
         },
-        "time": "2019-05-10T08:01:19+00:00",
+        "time": "2019-05-30T16:10:05+00:00",
         "type": "symfony-bundle",
         "extra": {
             "branch-alias": {
