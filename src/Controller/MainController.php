@@ -12,8 +12,26 @@ class MainController extends AbstractController
      */
     public function index()
     {
-        return $this->render('main/index.html.twig', [
-            'controller_name' => 'MainController',
-        ]);
+
+//        if (is_granted('IS_AUTHENTICATED_ANONYMOUS')){
+
+            return $this->render('main/index.html.twig', [
+                'controller_name' => 'MainController',
+            ]);
+//        }else {
+//
+//            return $this->redirect($this->generateUrl('home'));
+//        }
+
+
+    }
+
+
+    /**
+     * @Route("/home", name="home")
+     */
+    public function home(){
+
+        return $this->render('main/home.html.twig');
     }
 }

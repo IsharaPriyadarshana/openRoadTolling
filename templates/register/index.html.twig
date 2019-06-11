@@ -1,0 +1,239 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Register{% endblock %}
+{% block refHome %}{{ path('main') }}{% endblock %}
+
+ {% block stylesheets %}
+     <style>
+
+         img {
+             width: 50%;
+             height: auto;
+             max-width: 50%;
+             display: block;
+             margin-left: auto;
+             margin-right: auto;
+
+         }
+
+
+
+     </style>
+
+ {% endblock %}
+
+
+
+{% block body %}
+
+    <div class="container" style=" margin-left: auto;margin-right: auto;margin-top: 1cm;" >
+        <div class="row">
+{#            <div class="col-lg-2"></div>#}
+            <div class="col-lg-10">
+                <div class="card" style="width: 50rem;text-align: center;">
+                    <div class="card-body">
+                        <h3 class="card-title float-left">Register</h3>
+                        <div style="margin-top: 2cm;">
+                            <p class="card-text">
+
+                            {% if(errorCode !="") %}
+                            <div class="alert alert-danger" role="alert" >
+                                {{ errorCode }}
+                            </div>
+                            {% endif %}
+
+
+                            <form name="register" id="register_form"  method="post" enctype="multipart/form-data">
+                                <div id="register">
+                                    <div class="container">
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                {{ form_errors(form.firstName) }}
+                                                {{ form_widget(form.firstName) }}
+                                            </div>
+                                            <div class="col-sm-2"></div>
+                                            <div class="col-sm-5">
+                                                {{ form_errors(form.lastName) }}
+                                                {{ form_widget(form.lastName) }}
+                                            </div>
+                                        </div>
+
+                                        <div style="margin-top: 0.5cm;"></div>
+
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                {{ form_errors(form.email) }}
+                                                {{ form_widget(form.email) }}
+                                            </div>
+                                            <div class="col-sm-1"></div>
+                                            <div class="col-sm-5">
+
+                                                    {{ form_errors(form.idNumber) }}
+                                                    <input type="text"  id="register_idNumber" placeholder="NIC Number" onkeypress="isInputNumber(event)" pattern="^[0-9]{9}[a-zA-Z]$" value="{{ form.idNumber.vars.value }}" name="register[idNumber]" required="required" class="form-control" " />                                                    <div class="input-group-append">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div style="margin-top: 0.5cm;"></div>
+
+                                        <div class="row">
+                                            <div class="col-sm-5">
+                                                <div style="margin-top: 0.5cm;"></div>
+                                                {{ form_errors(form.phoneNumber) }}
+                                                <input type="tel" id="register_phoneNumber" value="{{ form.phoneNumber.vars.value }}" name="register[phoneNumber]" onkeypress="isPhone(event)" required="required" placeholder="Phone Number" class="form-control" pattern="^[0-9]{10}$"" />
+                                            </div>
+                                            <div class="col-sm-2"></div>
+                                            <div class="co-sm-3" >
+                                                <img src="/images/uploadPhoto.png" id="imageUploaded" class="card-img-top" alt="login" style="height: 50px;width: 120px;float: right;float: bottom">
+                                            </div>
+                                            <div class="col-sm-1">
+                                                <button type="button" id="customUploadButton" class="btn btn-outline-primary" style="float: bottom;margin-top: 0.25cm">Photo</button>
+                                            </div>
+
+                                        </div>
+
+                                        <div style="margin-top: 0.5cm;"></div>
+                                        <div class="row" >
+                                            <div class="col-sm-7">
+                                                {{ form_errors(form.address) }}
+                                                {{ form_widget(form.address) }}
+                                            </div>
+                                            <div class="col-sm-1" hidden="hidden">
+                                                {{ form_widget(form.image) }}
+                                            </div>
+
+                                        </div>
+
+                                        <div style="margin-top: 0.5cm;"></div>
+                                        <div id="register_password">
+                                            <div class="form-group row">
+                                                {% for passwordField in form.password %}
+                                                <div class="col-sm-5">
+                                                    {{ form_errors(passwordField) }}
+                                                    {{ form_widget(passwordField) }}
+                                                </div>
+                                                <div class="col-sm-2"></div>
+                                                {% endfor %}
+
+                                        </div>
+                                            <div style="margin-top: 0.5cm;"></div>
+                                    </div>
+                                    </div>
+
+
+                                {{ form_widget(form.save) }}
+
+                                {{ form_row(form._token) }}
+                                    {{ form_errors(form) }}
+
+                            </form>
+
+
+
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1"></div>
+        </div>
+
+    </div>
+
+
+
+
+{% endblock %}
+
+  {% block javascripts %}
+  <script>
+    const fileUpload = document.getElementById('register_image');
+    const uploadButton = document.getElementById('customUploadButton');
+    const imageBox = document.getElementById('imageUploaded');
+    const fname = document.getElementById("register_firstName");
+
+
+    uploadButton.addEventListener("click",function () {
+        fileUpload.click();
+    });
+
+  </script>
+      <script>
+          $(function(){
+              $('#register_image').change(function(){
+                  var input = this;
+                  var url = $(this).val();
+                  var ext = url.substring(url.lastIndexOf('.') + 1).toLowerCase();
+                  if (input.files && input.files[0]&& (ext == "gif" || ext == "png" || ext == "jpeg" || ext == "jpg"))
+                  {
+                      var reader = new FileReader();
+
+                      reader.onload = function (e) {
+                          $('#imageUploaded').attr('src', e.target.result);
+                      }
+                      reader.readAsDataURL(input.files[0]);
+                  }
+                  else
+                  {
+                      $('#imageUploaded').attr('src', '/images/uploadPhoto.png');
+                  }
+              });
+
+          });
+      </script>
+
+<script>
+function isInputNumber(eve) {
+    var ch = String.fromCharCode(eve.which);
+
+    if (document.getElementById('register_idNumber').value.length < 9){
+        if (!(/[0-9]/.test(ch))){
+            eve.preventDefault();
+        }
+    }else {
+        if (!(/[a-zA-Z]/.test(ch))){
+            eve.preventDefault();
+        }
+    }
+
+    if (document.getElementById('register_idNumber').value.length > 9){
+        eve.preventDefault();
+    }
+}
+function isPhone(eve) {
+    var ch = String.fromCharCode(eve.which);
+
+    if (!(/[0-9]/.test(ch))){
+        eve.preventDefault();
+    }
+    if (document.getElementById('register_phoneNumber').value.length > 9){
+        eve.preventDefault();
+    }
+}
+
+
+</script>
+
+      <script>
+          // document.addEventListener("DOMContentLoaded", function() {
+          //     const modalButton = document.getElementById('modalButton');
+          //     const modalButton2 = document.getElementById('modalButton2');
+          //     const errorLabel = document.getElementById('errorLabel');
+          //     if (errorLabel.textContent==1){
+          //         modalButton.click();
+          //     }
+          //     if(errorLabel.textContent==2){
+          //         modalButton2.click();
+          //     }
+          //
+          // });
+
+
+        
+
+
+      </script>
+
+  {% endblock %}
