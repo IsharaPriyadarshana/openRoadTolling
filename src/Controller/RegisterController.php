@@ -4,13 +4,14 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegisterType;
+use App\Repository\UserRepository;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
 class RegisterController extends AbstractController
 {
     /**
@@ -67,4 +68,89 @@ class RegisterController extends AbstractController
             'errorCode' => ""
         ]);
     }
+
+
+    /**
+     * @Route("/update/{id}", name="update")
+     * @param $id
+     * @param Request $request
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param UserRepository $userRepository
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
+     */
+
+    public function updateUser($id,Request $request, UserPasswordEncoderInterface $passwordEncoder){
+        $em = $this->getDoctrine()->getManager();
+        $conn =$em->getConnection();
+        $user = $em->find(User::class,$id);
+
+        $form = $this->createForm(RegisterType::class,$user,[
+            'validation_groups' => ['update'],
+        ]);
+
+
+        $form->handleRequest($request);
+
+        if($form->isSubmitted() && $form->isValid()){
+
+            $file = $request->files->get('register')['image'];
+            if($file){
+                $fileName = md5(uniqid()).'.'.$file->guessExtension();
+                $file->move(
+                    $this->getParameter('uploads_dir'), $fileName
+                );
+                $user->setImage($fileName);
+            }
+
+            if($user->getPassword() !=""){
+                $user->setPassword($passwordEncoder->encodePassword($user,$user->getPassword()));
+
+                $sql = '
+                        UPDATE user
+                        SET first_name = :firstName, last_name = :lastName, id_number = :idNumber, phone_number = :phoneNumber, address = :address, password = :password
+                        WHERE id= :id
+        ';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute(['firstName' => $user->getFirstName(),
+                    'lastName' => $user->getLastName(),
+                    'idNumber' => $user->getIdNumber(),
+                    'phoneNumber' => $user->getPhoneNumber(),
+                    'address' => $user->getAddress(),
+                    'password' => $user->getPassword(),
+                    'id' => $id]);
+            }else{
+                $sql = '
+                        UPDATE user
+                        SET first_name = :firstName, last_name = :lastName, id_number = :idNumber, phone_number = :phoneNumber, address = :address
+                        WHERE id= :id
+        ';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute(['firstName' => $user->getFirstName(),
+                    'lastName' => $user->getLastName(),
+                    'idNumber' => $user->getIdNumber(),
+                    'phoneNumber' => $user->getPhoneNumber(),
+                    'address' => $user->getAddress(),
+                    'id' => $id]);
+            }
+
+
+
+            return $this->redirectToRoute('home');
+        }
+
+
+
+
+
+
+        return $this->render('register/update.html.twig', [
+            'form'=>$form->createView(),
+        ]);
+
+
+
+
+    }
+
+
 }

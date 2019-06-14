@@ -40,14 +40,14 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string",length=255)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(groups={"update"})
      *
      */
     private $firstName;
 
     /**
      * @ORM\Column(type="string",length=255)
-     * @Assert\NotBlank()
+     * @Assert\NotBlank(groups={"update"})
      */
     private $lastName;
 
@@ -58,22 +58,20 @@ class User implements UserInterface
     private $image;
 
     /**
-     * @ORM\Column(type="string")
-     *@Assert\NotBlank()
+     * @ORM\Column(type="string", nullable=true)
      */
     private $address;
 
     /**
      * @ORM\Column(type="string",length=10)
-     * @Assert\NotBlank()
-     * @Assert\Length("10")
+     * @Assert\Length("10",groups={"update"})
      */
     private $phoneNumber;
 
     /**
      * @ORM\Column(type="string",length=10)
-     * @Assert\NotBlank()
-     * @Assert\Length("10")
+     * @Assert\NotBlank(groups={"update"})
+     * @Assert\Length("10",groups={"update"})
      */
     private $idNumber;
 
@@ -82,12 +80,12 @@ class User implements UserInterface
         return $this->id;
     }
 
-    public function getEmail(): ?string
+    public function getEmail()
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): self
+    public function setEmail( $email): self
     {
         $this->email = $email;
 
@@ -99,7 +97,7 @@ class User implements UserInterface
      *
      * @see UserInterface
      */
-    public function getUsername(): string
+    public function getUsername()
     {
         return (string) $this->email;
     }
@@ -116,12 +114,12 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPassword()
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): self
+    public function setPassword($password): self
     {
         $this->password = $password;
 
@@ -145,72 +143,72 @@ class User implements UserInterface
         // $this->plainPassword = null;
     }
 
-    public function getFirstName(): ?string
+    public function getFirstName()
     {
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): self
+    public function setFirstName( $firstName): self
     {
         $this->firstName = $firstName;
 
         return $this;
     }
 
-    public function getLastName(): ?string
+    public function getLastName()
     {
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): self
+    public function setLastName( $lastName): self
     {
         $this->lastName = $lastName;
 
         return $this;
     }
 
-    public function getImage(): ?string
+    public function getImage()
     {
         return $this->image;
     }
 
-    public function setImage(?string $image): self
+    public function setImage($image): self
     {
         $this->image = $image;
 
         return $this;
     }
 
-    public function getAddress(): ?string
+    public function getAddress()
     {
         return $this->address;
     }
 
-    public function setAddress(string $address): self
+    public function setAddress( $address): self
     {
         $this->address = $address;
 
         return $this;
     }
 
-    public function getIdNumber(): ?string
+    public function getIdNumber()
     {
         return $this->idNumber;
     }
 
-    public function setIdNumber(string $idNumber): self
+    public function setIdNumber( $idNumber): self
     {
         $this->idNumber = $idNumber;
 
         return $this;
     }
 
-    public function getPhoneNumber(): ?string
+    public function getPhoneNumber()
     {
         return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phoneNumber): self
+    public function setPhoneNumber( $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
 
