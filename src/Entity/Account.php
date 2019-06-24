@@ -32,7 +32,7 @@ class Account
     private $ownerName;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\User", mappedBy="account")
+     * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="account")
      */
     private $user;
 

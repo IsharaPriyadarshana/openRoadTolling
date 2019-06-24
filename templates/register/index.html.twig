@@ -142,9 +142,9 @@
                                                                 <div class="col-lg-4">
                                                                     <select class="custom-select" id="vehicleClassSelect">
                                                                         <option selected>Vehicle Class</option>
-                                                                        <option value="1">One</option>
-                                                                        <option value="2">Two</option>
-                                                                        <option value="3">Three</option>
+                                                                        {% for vehicleClass in vehicleClasses %}
+                                                                        <option>{{ vehicleClass.className }}</option>
+                                                                        {% endfor %}
                                                                     </select>
                                                                 </div>
                                                                 <div class="col-lg-2" style="float: left;">
@@ -339,7 +339,29 @@ function isPhone(eve) {
                   var opt = document.createElement('option');
                   opt.value = vehicleNo.value + "        |        " + vehicleClass.value ;
                   opt.innerHTML = vehicleNo.value + "        |        " + vehicleClass.value;
-                  addedVehicles.appendChild(opt);
+                  var existingOptions = addedVehicles.options;
+                  var isExist = false;
+
+                  for(var i=0;i<existingOptions.length;i++){
+                      if(existingOptions[i].value == opt.value){
+                          isExist = true;
+                      }
+                  }
+
+
+                if(isExist == false){
+                    addedVehicles.appendChild(opt);
+
+                    var input = document.createElement("input");
+
+                    input.setAttribute("type", "hidden");
+
+                    input.setAttribute("name", "vehicles["+addedVehicles.length +"]");
+                    input.setAttribute("id", "vehicles["+addedVehicles.length +"]");
+
+                    input.setAttribute("value", vehicleNo.value + "        |        " + vehicleClass.value);
+                    addedVehicles.appendChild(input);
+                }
               }
 
           });
@@ -347,6 +369,7 @@ function isPhone(eve) {
              try{
                  var options = addedVehicles.getElementsByTagName('OPTION');
                  addedVehicles.removeChild(options[addedVehicles.selectedIndex]);
+                 document.getElementById( "vehicles["+(addedVehicles.selectedIndex+1)+"]").remove();
              }catch (e) {
 
              }

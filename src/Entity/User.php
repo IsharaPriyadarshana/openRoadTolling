@@ -84,7 +84,7 @@ class User implements UserInterface
     private $vehicle;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Account", inversedBy="user")
+     * @ORM\OneToOne(targetEntity="App\Entity\Account", mappedBy="user")
      */
     private $account;
 

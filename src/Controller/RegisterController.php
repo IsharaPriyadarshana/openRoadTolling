@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\VehicleClass;
 use App\Form\RegisterType;
 use App\Form\UpdateType;
+use App\Repository\AccountRepository;
 use App\Repository\UserRepository;
+use App\Repository\VehicleClassRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -26,21 +29,28 @@ class RegisterController extends AbstractController
      * @Route("/register", name="register")
      * @param Request $request
      * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param VehicleClass $vehicleClass
      * @return Response
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder)
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, VehicleClassRepository $vehicleClassRepository)
     {
+        $em = $this->getDoctrine()->getManager();
+        $conn =$em->getConnection();
         $user = new User();
         $form = $this->createForm(RegisterType::class,$user,[
             'allow_extra_fields' => true
         ]);
+
+        $vehicleClasses = $vehicleClassRepository->findAll();
+
+
         $form->handleRequest($request);
 
 
         $errorsEmail = $form['email']->getErrors();
 
         if($form->isSubmitted() && $form->isValid()){
-//dump($request);die;
+
             $user->setPassword($passwordEncoder->encodePassword($user,$user->getPassword()));
             $user->setRoles(["ROLE_USER"]);
             /**
@@ -57,9 +67,37 @@ class RegisterController extends AbstractController
                 $user->setImage($fileName);
             }
 
-            $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
+
+            $registeredVehicles = $request->request->all()['vehicles'];
+
+            foreach ($registeredVehicles as $registeredVehicle){
+                $vehicle = explode("        |        ",$registeredVehicle);
+
+                $sql = '
+                        INSERT INTO vehicle(vehicle_no,class_id,user_id)VALUES(:vehicleNo,:classId,:userId)';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute(['vehicleNo' => $vehicle[0],
+                    'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId(),
+                    'userId' => $user->getId()]);
+            }
+
+            $account = $request->request->all()['account'];
+
+            if(($account['accountNo'] !="")&&($account['ownerName']!="")){
+                $sql = '
+                        INSERT INTO account(account_no,owner_name,user_id)VALUES(:accountNo,:ownerName,:userId)';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute(['accountNo' => $account['accountNo'],
+                    'ownerName' => $account['ownerName'] ,
+                    'userId' => $user->getId()]);
+
+            }
+
+
+
+
             return $this->redirect($this->generateUrl('home'));
         }else{
 
@@ -67,6 +105,7 @@ class RegisterController extends AbstractController
                   $errorsEmail=null;
                   return $this->render('register/index.html.twig', [
                       'form'=>$form->createView(),
+                      'vehicleClasses' => $vehicleClasses,
                       'errorCode' => "Email is already registered on the system. Try login!"
                   ]);
               }
@@ -78,6 +117,7 @@ class RegisterController extends AbstractController
 
         return $this->render('register/index.html.twig', [
             'form'=>$form->createView(),
+            'vehicleClasses' => $vehicleClasses,
             'errorCode' => ""
         ]);
     }
