@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -31,7 +32,19 @@ class MainController extends AbstractController
      * @Route("/home", name="home")
      */
     public function home(){
+        $em = $this->getDoctrine()->getManager();
+        $user = $em->find(User::class,$this->get('security.token_storage')->getToken()->getUser()->getId());
 
-        return $this->render('main/home.html.twig');
+       if($user->getImage() == ""){
+           $photoSrc =  "/images/login.svg";
+       }else{
+           $photoSrc =  "/uploads/".$user->getImage();
+       }
+
+        return $this->render('main/home.html.twig',[
+            'photoSrc' => $photoSrc,
+            'user' => $user,
+            'editProfile'=> $this->generateUrl('update',['id'=> $this->get('security.token_storage')->getToken()->getUser()->getId()])
+        ]);
     }
 }

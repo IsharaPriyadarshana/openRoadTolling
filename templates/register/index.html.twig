@@ -119,6 +119,98 @@
 
                                         </div>
                                             <div style="margin-top: 0.5cm;"></div>
+                                            <div class="row">
+                                                <div class="col-sm-10">
+                                                    <p>
+                                                        <a class="btn btn-primary" data-toggle="collapse" href="#collapseVehicle" style="float: left" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                            Add Vehicles
+                                                        </a>
+
+                                                    </p>
+
+                                                </div>
+                                            </div>
+                                            <div class="row">
+
+                                                    <div class="collapse" style="float: left" id="collapseVehicle">
+                                                        <div class="card card-body">
+                                                            <div class="row">
+                                                                <div class="col-lg-5">
+                                                                    <input type="text" class="form-control" id="register_vehicleNo" aria-describedby="emailHelp" placeholder="Vehicle No" >
+                                                                </div>
+
+                                                                <div class="col-lg-4">
+                                                                    <select class="custom-select" id="vehicleClassSelect">
+                                                                        <option selected>Vehicle Class</option>
+                                                                        <option value="1">One</option>
+                                                                        <option value="2">Two</option>
+                                                                        <option value="3">Three</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="col-lg-2" style="float: left;">
+                                                                    <button type="button" id="addVehicleButton" class="btn btn-primary">Add</button>
+                                                                </div>
+
+
+
+                                                            </div>
+                                                            <div style="margin-top: 0.5cm;"></div>
+                                                            <div class="row">
+                                                                <div class="col-lg-8">
+                                                                    <div class="form-group">
+                                                                        <label for="registeredVehicles">Vehicles Registered on the System</label>
+                                                                        <select multiple class="form-control" id="registeredVehicles" name="vehicles[]">
+
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="col-lg-2" style="float: right;">
+                                                                        <button type="button" id="removeVehicleButton" class="btn btn-primary">Remove</button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                            </div>
+
+
+
+
+                                            <div style="margin-top: 0.5cm;"></div>
+                                            <div class="row">
+                                                <div class="col-sm-10">
+                                                    <p>
+                                                        <a class="btn btn-primary" data-toggle="collapse" href="#collapseAccount" style="float: left" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                            Add Account
+                                                        </a>
+
+                                                    </p>
+
+                                                </div>
+                                            </div>
+                                            <div class="row">
+
+                                                <div class="collapse" style="float: left" id="collapseAccount">
+                                                    <div class="card card-body">
+                                                        <div class="row">
+                                                            <div class="col-lg-5">
+                                                                <input type="text" class="form-control" id="register_accountNo" aria-describedby="emailHelp" placeholder="Account No" name="account[accountNo]" >
+                                                            </div>
+                                                            <div class="col-lg-5">
+                                                                <input type="text" class="form-control" id="register_ownerName" aria-describedby="emailHelp" placeholder="Owner Name" name="account[ownerName]" >
+                                                            </div>
+
+
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+
+
                                     </div>
                                     </div>
 
@@ -234,6 +326,31 @@ function isPhone(eve) {
 
 
 
+      </script>
+
+      <script>
+          const addVehicleButton = document.getElementById('addVehicleButton');
+          const vehicleNo = document.getElementById('register_vehicleNo');
+          const vehicleClass = document.getElementById('vehicleClassSelect');
+          const addedVehicles = document.getElementById('registeredVehicles');
+          const removeVehicleButton = document.getElementById('removeVehicleButton');
+          addVehicleButton.addEventListener("click", function () {
+              if(vehicleClass.value != "Vehicle Class"){
+                  var opt = document.createElement('option');
+                  opt.value = vehicleNo.value + "        |        " + vehicleClass.value ;
+                  opt.innerHTML = vehicleNo.value + "        |        " + vehicleClass.value;
+                  addedVehicles.appendChild(opt);
+              }
+
+          });
+          removeVehicleButton.addEventListener("click",function () {
+             try{
+                 var options = addedVehicles.getElementsByTagName('OPTION');
+                 addedVehicles.removeChild(options[addedVehicles.selectedIndex]);
+             }catch (e) {
+
+             }
+          });
       </script>
 
   {% endblock %}

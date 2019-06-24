@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Edit Info{% endblock %}
-{% block refHome %}{{ path('main') }}{% endblock %}
+{% block refHome %}{{ path('home') }}{% endblock %}
 
  {% block stylesheets %}
 
@@ -42,8 +42,8 @@
 
 
 
-                            <form name="register" id="register_form"  method="post" enctype="multipart/form-data">
-                                <div id="register">
+                            <form name="update"  method="post">
+                                <div id="update">
                                     <div class="container">
                                         <div class="row">
                                             <div class="col-sm-5">
@@ -68,7 +68,7 @@
                                             <div class="col-sm-5">
 
                                                 {{ form_errors(form.idNumber) }}
-                                                <input type="text"  id="register_idNumber" placeholder="NIC Number" onkeypress="isInputNumber(event)" pattern="^[0-9]{9}[a-zA-Z]$" value="{{ form.idNumber.vars.value }}" name="register[idNumber]" required="required" class="form-control" " />                                                    <div class="input-group-append">
+                                                <input type="text"  id="update_idNumber" placeholder="NIC Number" onkeypress="isInputNumber(event)" pattern="^[0-9]{9}[a-zA-Z]$" value="{{ form.idNumber.vars.value }}" name="update[idNumber]" required="required" class="form-control" " />                                                    <div class="input-group-append">
 
                                                 </div>
                                             </div>
@@ -81,7 +81,7 @@
                                             <div class="col-sm-5">
                                                 <div style="margin-top: 0.5cm;"></div>
                                                 {{ form_errors(form.phoneNumber) }}
-                                                <input type="tel" id="register_phoneNumber" value="{{ form.phoneNumber.vars.value }}" name="register[phoneNumber]" onkeypress="isPhone(event)" required="required" placeholder="Phone Number" class="form-control" pattern="^[0-9]{10}$" />
+                                                <input type="tel" id="update_phoneNumber" value="{{ form.phoneNumber.vars.value }}" name="update[phoneNumber]" onkeypress="isPhone(event)" required="required" placeholder="Phone Number" class="form-control" pattern="^[0-9]{10}$" />
                                             </div>
                                             <div class="col-sm-2"></div>
 
@@ -95,7 +95,6 @@
                                                 {{ form_widget(form.address) }}
                                             </div>
                                             <div class="col-sm-1" hidden="hidden">
-                                                {{ form_widget(form.image) }}
                                             </div>
 
                                         </div>

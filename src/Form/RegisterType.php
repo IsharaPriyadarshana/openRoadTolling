@@ -41,7 +41,7 @@ class RegisterType extends AbstractType
             ->add('address',TextareaType::class,['required' => false,'label'=>'Address','attr'=>['placeholder'=>"Address"]])
             ->add('idNumber',TextType::class,['label'=>'NIC Number','attr'=>['placeholder'=>"NIC Number"]])
             ->add('phoneNumber',TelType::class,['label'=>'Phone Number','attr'=>['placeholder'=>"Phone Number"]])
-            ->add('image',FileType::class,['label'=>'Photo','required'=>false,'attr'=>['hidden'=>"hidden", 'accept'=>"image/jpeg, image/png"]])
+            ->add('image',FileType::class,['label'=>'Photo','required'=>false,'empty_data' => null,'attr'=>['hidden'=>"hidden", 'accept'=>"image/jpeg, image/png"]])
             ->add('save',SubmitType::class,[
                 'label'=>'Register',
                 'attr' => [

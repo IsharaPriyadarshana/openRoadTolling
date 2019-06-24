@@ -2,9 +2,12 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 
 /**
@@ -75,6 +78,22 @@ class User implements UserInterface
      */
     private $idNumber;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Vehicle", mappedBy="user")
+     */
+    private $vehicle;
+
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Account", inversedBy="user")
+     */
+    private $account;
+
+
+    public function __construct()
+    {
+        $this->vehicle = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -134,14 +153,8 @@ class User implements UserInterface
         // not needed when using the "bcrypt" algorithm in security.yaml
     }
 
-    /**
-     * @see UserInterface
-     */
-    public function eraseCredentials()
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
-    }
+    public function eraseCredentials(){}
+
 
     public function getFirstName()
     {
@@ -167,12 +180,12 @@ class User implements UserInterface
         return $this;
     }
 
-    public function getImage()
+    public function getImage(): ?string
     {
         return $this->image;
     }
 
-    public function setImage($image): self
+    public function setImage(string $image): self
     {
         $this->image = $image;
 
@@ -211,6 +224,49 @@ class User implements UserInterface
     public function setPhoneNumber( $phoneNumber): self
     {
         $this->phoneNumber = $phoneNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Vehicle[]
+     */
+    public function getVehicle(): Collection
+    {
+        return $this->vehicle;
+    }
+
+    public function addVehicle(Vehicle $vehicle): self
+    {
+        if (!$this->vehicle->contains($vehicle)) {
+            $this->vehicle[] = $vehicle;
+            $vehicle->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVehicle(Vehicle $vehicle): self
+    {
+        if ($this->vehicle->contains($vehicle)) {
+            $this->vehicle->removeElement($vehicle);
+            // set the owning side to null (unless already changed)
+            if ($vehicle->getUser() === $this) {
+                $vehicle->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAccount(): ?Account
+    {
+        return $this->account;
+    }
+
+    public function setAccount(?Account $account): self
+    {
+        $this->account = $account;
 
         return $this;
     }
