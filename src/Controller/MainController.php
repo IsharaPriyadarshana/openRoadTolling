@@ -40,7 +40,7 @@ class MainController extends AbstractController
        }else{
            $photoSrc =  "/uploads/".$user->getImage();
        }
-
+//       dump($user->getVehicle()[1]);die;
         return $this->render('main/home.html.twig',[
             'photoSrc' => $photoSrc,
             'user' => $user,

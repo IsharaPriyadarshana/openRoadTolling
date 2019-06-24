@@ -204,10 +204,43 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="vehicles" role="tabpanel" aria-labelledby="profile-tab">
-
+                            {% for vehicle in user.vehicle %}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Vehicle Number</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>{{ vehicle.vehicleNo}}</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label>Vehicle Class</label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p>{{ vehicle.class.className }}</p>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 1cm;"></div>
+                            {% endfor %}
                         </div>
                         <div class="tab-pane fade" id="account" role="tabpanel" aria-labelledby="profile-tab">
-
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Account Number</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>{{ user.account.accountNo }}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>Owner Name</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <p>{{ user.account.ownerName }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
