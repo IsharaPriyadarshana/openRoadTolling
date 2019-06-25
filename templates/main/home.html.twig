@@ -204,6 +204,7 @@
                             </div>
                         </div>
                         <div class="tab-pane fade" id="vehicles" role="tabpanel" aria-labelledby="profile-tab">
+                            {% if(user.vehicle|length >0) %}
                             {% for vehicle in user.vehicle %}
                                 <div class="row">
                                     <div class="col-md-6">
@@ -223,8 +224,10 @@
                                 </div>
                                 <div style="margin-top: 1cm;"></div>
                             {% endfor %}
+                            {% endif %}
                         </div>
                         <div class="tab-pane fade" id="account" role="tabpanel" aria-labelledby="profile-tab">
+                            {% if(user.account|length >0) %}
                             <div class="row">
                                 <div class="col-md-6">
                                     <label>Account Number</label>
@@ -241,6 +244,7 @@
                                     <p>{{ user.account.ownerName }}</p>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

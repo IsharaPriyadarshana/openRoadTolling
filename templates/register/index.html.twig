@@ -368,8 +368,9 @@ function isPhone(eve) {
           removeVehicleButton.addEventListener("click",function () {
              try{
                  var options = addedVehicles.getElementsByTagName('OPTION');
-                 addedVehicles.removeChild(options[addedVehicles.selectedIndex]);
                  document.getElementById( "vehicles["+(addedVehicles.selectedIndex+1)+"]").remove();
+                 addedVehicles.removeChild(options[addedVehicles.selectedIndex]);
+
              }catch (e) {
 
              }

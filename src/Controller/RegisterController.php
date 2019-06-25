@@ -70,18 +70,21 @@ class RegisterController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            $registeredVehicles = $request->request->all()['vehicles'];
+            if(isset($request->request->all()['vehicles'])){
+                $registeredVehicles = $request->request->all()['vehicles'];
+                foreach ($registeredVehicles as $registeredVehicle){
+                    $vehicle = explode("        |        ",$registeredVehicle);
 
-            foreach ($registeredVehicles as $registeredVehicle){
-                $vehicle = explode("        |        ",$registeredVehicle);
-
-                $sql = '
+                    $sql = '
                         INSERT INTO vehicle(vehicle_no,class_id,user_id)VALUES(:vehicleNo,:classId,:userId)';
-                $stmt = $conn->prepare($sql);
-                $stmt->execute(['vehicleNo' => $vehicle[0],
-                    'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId(),
-                    'userId' => $user->getId()]);
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute(['vehicleNo' => $vehicle[0],
+                        'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId(),
+                        'userId' => $user->getId()]);
+                }
             }
+
+
 
             $account = $request->request->all()['account'];
 
@@ -132,10 +135,10 @@ class RegisterController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
 
-    public function updateUser($id,Request $request, UserPasswordEncoderInterface $passwordEncoder,UrlGeneratorInterface $urlGenerator){
+    public function updateUser($id,Request $request, UserPasswordEncoderInterface $passwordEncoder,UrlGeneratorInterface $urlGenerator, VehicleClassRepository $vehicleClassRepository){
 
         $loggedUser = $this->get('security.token_storage')->getToken()->getUser()->getId();
-
+        $vehicleClasses = $vehicleClassRepository->findAll();
         if ($id == $loggedUser){
             $em = $this->getDoctrine()->getManager();
             $conn =$em->getConnection();
@@ -184,6 +187,57 @@ class RegisterController extends AbstractController
                         'id' => $id]);
                 }
 
+                if(isset($request->request->all()['vehicles'])){
+                    $registeredVehicles = $request->request->all()['vehicles'];
+                    $this->removeVehicles($user,$registeredVehicles);
+                    $alreadyInVehicles = $this->getVehicleNos($user->getVehicle());
+                    foreach ($registeredVehicles as $registeredVehicle){
+                        $vehicle = explode("        |        ",$registeredVehicle);
+                        if(!in_array($vehicle[0],$alreadyInVehicles)){
+                            $sql = '
+                        INSERT INTO vehicle(vehicle_no,class_id,user_id)VALUES(:vehicleNo,:classId,:userId)';
+                            $stmt = $conn->prepare($sql);
+                            $stmt->execute(['vehicleNo' => $vehicle[0],
+                                'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId(),
+                                'userId' => $user->getId()]);
+                        }
+                    }
+                }else{
+                    $this->removeVehicles($user,array());
+                }
+
+
+
+                $account = $request->request->all()['account'];
+
+                if(($account['accountNo'] !="")&&($account['ownerName']!="")){
+                  if($user->getAccount() !=""){
+                      $sql = '
+                        UPDATE account
+                        SET account_no = :accountNo, owner_name = :ownerName
+                        WHERE user_id= :userId
+        ';
+                      $stmt = $conn->prepare($sql);
+                      $stmt->execute(['accountNo' => $account['accountNo'],
+                          'ownerName' => $account['ownerName'] ,
+                          'userId' => $user->getId()]);
+                  }else{
+                      $sql = '
+                        INSERT INTO account
+                         (account_no, owner_name,user_id)VALUES ( :accountNo,:ownerName,:userId)
+                       
+        ';
+                      $stmt = $conn->prepare($sql);
+                      $stmt->execute(['accountNo' => $account['accountNo'],
+                          'ownerName' => $account['ownerName'] ,
+                          'userId' => $user->getId()]);
+                  }
+                }else{
+                    $sql = 'DELETE FROM account WHERE user_id=:userId;';
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute([
+                        'userId' => $user->getId()]);
+                }
 
 
                 return new RedirectResponse($urlGenerator->generate('home'));
@@ -196,6 +250,8 @@ class RegisterController extends AbstractController
 
         return $this->render('register/update.html.twig', [
             'form'=>$form->createView(),
+            'user' => $user,
+            'vehicleClasses' => $vehicleClasses
         ]);
     }
 
@@ -207,23 +263,73 @@ class RegisterController extends AbstractController
 
     public function changeImage(Request $request){
 
+        $em = $this->getDoctrine()->getManager();
+        $conn = $em->getConnection();
+
         $file = $request->files->get('file');
         $currentImage = $this->get('security.token_storage')->getToken()->getUser()->getImage();
-        $myFile = $this->getParameter('uploads_dir').$currentImage;
-        try{
-            unlink($myFile);
+        if($currentImage == ""){
 
-        } catch (Exception $e){
+            if($file){
+                $fileName = md5(uniqid()).'.'.$file->guessExtension();
+                $file->move(
+                    $this->getParameter('uploads_dir'), $fileName
+                );
+                $sql = '
+                        UPDATE user
+                        SET  image = :image
+                        WHERE id= :id
+        ';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    'image' => $fileName,
+                    'id' => $this->get('security.token_storage')->getToken()->getUser()->getId()]);
+            }
 
+        }else{
+            $myFile = $this->getParameter('uploads_dir').$currentImage;
+            try{
+                unlink($myFile);
+
+            } catch (Exception $e){
+
+            }
+            if($file){
+                $fileName = $currentImage;
+                $file->move(
+                    $this->getParameter('uploads_dir'), $fileName
+                );
+
+            }
         }
-        if($file){
-            $fileName = $currentImage;
-            $file->move(
-                $this->getParameter('uploads_dir'), $fileName
-            );
 
-        }
 return $this->redirectToRoute('home');
+    }
+
+    public function getVehicleNos($vehicles){
+        $vehicleNos = array();
+       foreach($vehicles as $vehicle){
+            array_push($vehicleNos,$vehicle->getvehicleNo());
+       }
+       return $vehicleNos;
+    }
+
+    public function removeVehicles($user,$vehicles){
+        $conn = $this->getDoctrine()->getManager()->getConnection();
+       $regVehicles= $this->getVehicleNos($user->getVehicle());
+       $newVehicles = array();
+       foreach ($vehicles as $vehicle){
+           $newVehicles[]= explode("        |        ",$vehicle)[0];
+       }
+       foreach ($regVehicles as $regVehicle){
+           if(!in_array($regVehicle, $newVehicles)){
+               $sql = 'DELETE FROM vehicle WHERE user_id=:userId AND vehicle_no=:vehicleNo;';
+               $stmt = $conn->prepare($sql);
+               $stmt->execute([
+                   'vehicleNo'=> $regVehicle,
+                   'userId' => $user->getId()]);
+           }
+       }
     }
 
 }
