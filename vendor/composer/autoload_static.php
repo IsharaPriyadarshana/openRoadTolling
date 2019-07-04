@@ -13,7 +13,9 @@ class ComposerStaticInit56e80b3fb1a7e9aba7a2ffeebf9202d5
         '92c8763cd6170fce6fcfe7e26b4e8c10' => __DIR__ . '/..' . '/symfony/phpunit-bridge/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
+        'e88992873b7765f9b5710cab95ba5dd7' => __DIR__ . '/..' . '/hoa/consistency/Prelude.php',
         '6a47392539ca2329373e0d33e1dba053' => __DIR__ . '/..' . '/symfony/polyfill-intl-icu/bootstrap.php',
+        '3e76f7f02b41af8cea96018933f6b7e3' => __DIR__ . '/..' . '/hoa/protocol/Wrapper.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
     );
 
@@ -53,6 +55,7 @@ class ComposerStaticInit56e80b3fb1a7e9aba7a2ffeebf9202d5
             'Symfony\\Component\\VarDumper\\' => 28,
             'Symfony\\Component\\Validator\\' => 28,
             'Symfony\\Component\\Translation\\' => 30,
+            'Symfony\\Component\\Templating\\' => 29,
             'Symfony\\Component\\Stopwatch\\' => 28,
             'Symfony\\Component\\Serializer\\' => 29,
             'Symfony\\Component\\Security\\Http\\' => 32,
@@ -110,14 +113,41 @@ class ComposerStaticInit56e80b3fb1a7e9aba7a2ffeebf9202d5
             'PhpParser\\' => 10,
             'PackageVersions\\' => 16,
         ),
+        'N' => 
+        array (
+            'Negotiation\\' => 12,
+        ),
         'M' => 
         array (
             'Monolog\\' => 8,
+            'Metadata\\' => 9,
+        ),
+        'J' => 
+        array (
+            'JMS\\Serializer\\' => 15,
+            'JMS\\SerializerBundle\\' => 21,
+        ),
+        'H' => 
+        array (
+            'Hoa\\Zformat\\' => 12,
+            'Hoa\\Visitor\\' => 12,
+            'Hoa\\Ustring\\' => 12,
+            'Hoa\\Stream\\' => 11,
+            'Hoa\\Regex\\' => 10,
+            'Hoa\\Protocol\\' => 13,
+            'Hoa\\Math\\' => 9,
+            'Hoa\\Iterator\\' => 13,
+            'Hoa\\File\\' => 9,
+            'Hoa\\Exception\\' => 14,
+            'Hoa\\Event\\' => 10,
+            'Hoa\\Consistency\\' => 16,
+            'Hoa\\Compiler\\' => 13,
         ),
         'F' => 
         array (
             'Fig\\Link\\' => 9,
             'Facebook\\WebDriver\\' => 19,
+            'FOS\\RestBundle\\' => 15,
         ),
         'E' => 
         array (
@@ -232,6 +262,10 @@ class ComposerStaticInit56e80b3fb1a7e9aba7a2ffeebf9202d5
         'Symfony\\Component\\Translation\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/translation',
+        ),
+        'Symfony\\Component\\Templating\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/templating',
         ),
         'Symfony\\Component\\Stopwatch\\' => 
         array (
@@ -445,9 +479,77 @@ class ComposerStaticInit56e80b3fb1a7e9aba7a2ffeebf9202d5
         array (
             0 => __DIR__ . '/..' . '/ocramius/package-versions/src/PackageVersions',
         ),
+        'Negotiation\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/willdurand/negotiation/src/Negotiation',
+        ),
         'Monolog\\' => 
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
+        ),
+        'Metadata\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jms/metadata/src',
+        ),
+        'JMS\\Serializer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jms/serializer/src',
+        ),
+        'JMS\\SerializerBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jms/serializer-bundle',
+        ),
+        'Hoa\\Zformat\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/zformat',
+        ),
+        'Hoa\\Visitor\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/visitor',
+        ),
+        'Hoa\\Ustring\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/ustring',
+        ),
+        'Hoa\\Stream\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/stream',
+        ),
+        'Hoa\\Regex\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/regex',
+        ),
+        'Hoa\\Protocol\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/protocol',
+        ),
+        'Hoa\\Math\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/math',
+        ),
+        'Hoa\\Iterator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/iterator',
+        ),
+        'Hoa\\File\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/file',
+        ),
+        'Hoa\\Exception\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/exception',
+        ),
+        'Hoa\\Event\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/event',
+        ),
+        'Hoa\\Consistency\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/consistency',
+        ),
+        'Hoa\\Compiler\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/hoa/compiler',
         ),
         'Fig\\Link\\' => 
         array (
@@ -456,6 +558,10 @@ class ComposerStaticInit56e80b3fb1a7e9aba7a2ffeebf9202d5
         'Facebook\\WebDriver\\' => 
         array (
             0 => __DIR__ . '/..' . '/facebook/webdriver/lib',
+        ),
+        'FOS\\RestBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/friendsofsymfony/rest-bundle',
         ),
         'Egulias\\EmailValidator\\' => 
         array (
@@ -539,6 +645,13 @@ class ComposerStaticInit56e80b3fb1a7e9aba7a2ffeebf9202d5
             'ProxyManager\\' => 
             array (
                 0 => __DIR__ . '/..' . '/ocramius/proxy-manager/src',
+            ),
+        ),
+        'J' => 
+        array (
+            'JsonpCallbackValidator' => 
+            array (
+                0 => __DIR__ . '/..' . '/willdurand/jsonp-callback-validator/src',
             ),
         ),
         'D' => 
