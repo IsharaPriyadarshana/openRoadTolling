@@ -72,6 +72,11 @@ class User implements UserInterface
     private $phoneNumber;
 
     /**
+     * @ORM\Column(type="string",length=10, nullable=true)
+     */
+    private $revisionNo;
+
+    /**
      * @ORM\Column(type="string",length=10)
      * @Assert\NotBlank(groups={"update"})
      * @Assert\Length("10",groups={"update"})
@@ -79,7 +84,7 @@ class User implements UserInterface
     private $idNumber;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Vehicle", mappedBy="user")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Vehicle", mappedBy="user")
      */
     private $vehicle;
 
@@ -267,6 +272,18 @@ class User implements UserInterface
     public function setAccount(?Account $account): self
     {
         $this->account = $account;
+
+        return $this;
+    }
+
+    public function getRevisionNo(): ?string
+    {
+        return $this->revisionNo;
+    }
+
+    public function setRevisionNo(string $revisionNo): self
+    {
+        $this->revisionNo = $revisionNo;
 
         return $this;
     }

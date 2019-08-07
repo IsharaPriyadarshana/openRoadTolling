@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -22,7 +24,12 @@ class Vehicle
     private $vehicleNo;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="vehicle")
+     * @ORM\OneToOne(targetEntity="App\Entity\HighwayVehicle", mappedBy="vehicle")
+     */
+    private $highwayVehicle;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="vehicle")
      */
     private $user;
 
@@ -30,6 +37,11 @@ class Vehicle
      * @ORM\ManyToOne(targetEntity="App\Entity\VehicleClass", inversedBy="vehicle")
      */
     private $class;
+
+    public function __construct()
+    {
+        $this->user = new ArrayCollection();
+    }
 
 
 
@@ -70,6 +82,42 @@ class Vehicle
     public function setClass(?VehicleClass $class): self
     {
         $this->class = $class;
+
+        return $this;
+    }
+
+    public function addUser(User $user): self
+    {
+        if (!$this->user->contains($user)) {
+            $this->user[] = $user;
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): self
+    {
+        if ($this->user->contains($user)) {
+            $this->user->removeElement($user);
+        }
+
+        return $this;
+    }
+
+    public function getHighwayVehicle(): ?HighwayVehicle
+    {
+        return $this->highwayVehicle;
+    }
+
+    public function setHighwayVehicle(?HighwayVehicle $highwayVehicle): self
+    {
+        $this->highwayVehicle = $highwayVehicle;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newVehicle = $highwayVehicle === null ? null : $this;
+        if ($newVehicle !== $highwayVehicle->getVehicle()) {
+            $highwayVehicle->setVehicle($newVehicle);
+        }
 
         return $this;
     }

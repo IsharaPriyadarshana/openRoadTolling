@@ -51,6 +51,7 @@ class RegisterController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()){
 
+            $user->setRevisionNo('0');
             $user->setPassword($passwordEncoder->encodePassword($user,$user->getPassword()));
             $user->setRoles(["ROLE_USER"]);
             /**
@@ -161,7 +162,7 @@ class RegisterController extends AbstractController
 
                     $sql = '
                         UPDATE user
-                        SET first_name = :firstName, last_name = :lastName, id_number = :idNumber, phone_number = :phoneNumber, address = :address, password = :password
+                        SET first_name = :firstName, last_name = :lastName, id_number = :idNumber, phone_number = :phoneNumber, address = :address, password = :password, revision_no = :revisionNo
                         WHERE id= :id
         ';
                     $stmt = $conn->prepare($sql);
@@ -171,11 +172,12 @@ class RegisterController extends AbstractController
                         'phoneNumber' => $user->getPhoneNumber(),
                         'address' => $user->getAddress(),
                         'password' => $user->getPassword(),
+                        'revisionNo' => ($user->getRevisionNo()+1),
                         'id' => $id]);
                 }else{
                     $sql = '
                         UPDATE user
-                        SET first_name = :firstName, last_name = :lastName, id_number = :idNumber, phone_number = :phoneNumber, address = :address
+                        SET first_name = :firstName, last_name = :lastName, id_number = :idNumber, phone_number = :phoneNumber, address = :address, revision_no = :revisionNo
                         WHERE id= :id
         ';
                     $stmt = $conn->prepare($sql);
@@ -184,6 +186,7 @@ class RegisterController extends AbstractController
                         'idNumber' => $user->getIdNumber(),
                         'phoneNumber' => $user->getPhoneNumber(),
                         'address' => $user->getAddress(),
+                        'revisionNo' => ($user->getRevisionNo()+1),
                         'id' => $id]);
                 }
 

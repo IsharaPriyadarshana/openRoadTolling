@@ -30,7 +30,7 @@ class ApiController extends AbstractFOSRestController
      * @FOSRest\Post("/get_user")
      * @FOSRest\View()
      */
-    public function postGetUserAction(Request $request, UserRepository $userRepository,  UserPasswordEncoderInterface $passwordEncoder)
+    public function postGetUserAction(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
     {
         $user = $userRepository->findBy(['email' => $request->get('email')]);
 
@@ -49,11 +49,64 @@ class ApiController extends AbstractFOSRestController
             return new RES("User Not Found",RES::HTTP_NOT_FOUND);
         }
 
+    }
 
 
+    /**
+     * @FOSRest\Post("/update_user")
+     * @FOSRest\View()
+     */
+    public function postUpdateUserAction(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
 
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+                if($request->get('revisionNo') != $user->getRevisionNo()){
+                    $message = $this->jsonEncodeUser($user);
+                }else{
+                    $message = "Upto Date!";
+                }
+
+
+            } else {
+                $message = "Invalid Credentials!";
+            }
+
+            return new RES($message,RES::HTTP_FOUND);
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
 
     }
+
+//    /**
+//     * Test
+//     * @FOSRest\Post("/register_vehicle")
+//     * @FOSRest\View()
+//     */
+//    public function postRegisterVehicle(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
+//    {
+//        $user = $userRepository->findBy(['email' => $request->get('email')]);
+//
+//        if (count($user)){
+//            $user = $user[0];
+//            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+//
+//                $vehicle = json_decode($request->get('vehicle'));
+//
+//
+//            } else {
+//                $message = "Invalid Credentials!";
+//            }
+//
+//            return new RES($message,RES::HTTP_FOUND);
+//        }else {
+//            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+//        }
+//
+//    }
 
 
 
@@ -87,5 +140,8 @@ class ApiController extends AbstractFOSRestController
 
         return json_encode($jsonUser);
     }
+
+
+
 
 }
