@@ -14,6 +14,8 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\Annotations as FOSRest;
 use App\Entity\Article;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Response as RES;
 use Symfony\Component\HttpFoundation\Response as RES;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -38,13 +40,13 @@ class ApiController extends AbstractFOSRestController
             $user = $user[0];
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
                 $message = $this->jsonEncodeUser($user);
-
+                return new RES($message,RES::HTTP_FOUND);
 
             } else {
                 $message = "Invalid Credentials!";
+                return new RES($message,RES::HTTP_FORBIDDEN);
             }
 
-            return new RES($message,RES::HTTP_FOUND);
         }else {
             return new RES("User Not Found",RES::HTTP_NOT_FOUND);
         }
@@ -65,16 +67,19 @@ class ApiController extends AbstractFOSRestController
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
                 if($request->get('revisionNo') != $user->getRevisionNo()){
                     $message = $this->jsonEncodeUser($user);
+                    return new RES($message,RES::HTTP_FOUND);
                 }else{
                     $message = "Upto Date!";
+                    return new RES($message,RES::HTTP_OK);
                 }
 
 
             } else {
                 $message = "Invalid Credentials!";
+                return new RES($message,RES::HTTP_FORBIDDEN);
             }
 
-            return new RES($message,RES::HTTP_FOUND);
+
         }else {
             return new RES("User Not Found",RES::HTTP_NOT_FOUND);
         }
