@@ -16,7 +16,6 @@ use App\Entity\Article;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as RES;
-use Symfony\Component\HttpFoundation\Response as RES;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
