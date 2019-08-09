@@ -82,24 +82,24 @@ class HighwayVehicle
         return $this;
     }
 
-    public function getEntrance(): ?HighwayExtrnsion
+    public function getEntrance(): ?HighwayExtension
     {
         return $this->entrance;
     }
 
-    public function setEntrance(?HighwayExtrnsion $entrance): self
+    public function setEntrance(?HighwayExtension $entrance): self
     {
         $this->entrance = $entrance;
 
         return $this;
     }
 
-    public function getEgress(): ?HighwayExtrnsion
+    public function getEgress(): ?HighwayExtension
     {
         return $this->egress;
     }
 
-    public function setEgress(?HighwayExtrnsion $egress): self
+    public function setEgress(?HighwayExtension $egress): self
     {
         $this->egress = $egress;
 
