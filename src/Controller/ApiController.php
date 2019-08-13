@@ -132,7 +132,7 @@ class ApiController extends AbstractFOSRestController
             $vehicles[] = $tempVehicle;
         }
         $jsonUser["vehicle"] = $vehicles;
-
+        $jsonUser["revisionNo"] = $user->getRevisionNo();
         $path = $this->getParameter('uploads_dir').$user->getImage();
         $type = pathinfo($path, PATHINFO_EXTENSION);
         $data = file_get_contents($path);
