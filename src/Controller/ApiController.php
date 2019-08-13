@@ -121,9 +121,11 @@ class ApiController extends AbstractFOSRestController
         $jsonUser["address"] = $user->getAddress();
         $jsonUser["phoneNumber"] = $user->getPhoneNumber();
         $jsonUser["idNumber"] = $user->getIdNumber();
-        $jsonUser["account"]["accountNo"] = $user->getAccount()->getAccountNo();
-        $jsonUser["account"]["ownerName"] = $user->getAccount()->getOwnerName();
-        $jsonUser["account"]["balance"] = $user->getAccount()->getBalance();
+        if ($user->getAccount() !=""){
+            $jsonUser["account"]["accountNo"] = $user->getAccount()->getAccountNo();
+            $jsonUser["account"]["ownerName"] = $user->getAccount()->getOwnerName();
+            $jsonUser["account"]["balance"] = $user->getAccount()->getBalance();
+        }
         $vehicles= array();
         foreach ( $user->getVehicle() as $vehicle){
             $tempVehicle = array();

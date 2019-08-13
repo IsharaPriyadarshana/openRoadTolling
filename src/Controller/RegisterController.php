@@ -9,6 +9,7 @@ use App\Form\UpdateType;
 use App\Repository\AccountRepository;
 use App\Repository\UserRepository;
 use App\Repository\VehicleClassRepository;
+use App\Repository\VehicleRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -32,7 +33,7 @@ class RegisterController extends AbstractController
      * @param VehicleClass $vehicleClass
      * @return Response
      */
-    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, VehicleClassRepository $vehicleClassRepository)
+    public function register(Request $request, UserPasswordEncoderInterface $passwordEncoder, VehicleClassRepository $vehicleClassRepository, VehicleRepository $vehicleRepository)
     {
         $em = $this->getDoctrine()->getManager();
         $conn =$em->getConnection();
@@ -77,10 +78,15 @@ class RegisterController extends AbstractController
                     $vehicle = explode("        |        ",$registeredVehicle);
 
                     $sql = '
-                        INSERT INTO vehicle(vehicle_no,class_id,user_id)VALUES(:vehicleNo,:classId,:userId)';
+                        INSERT INTO vehicle (vehicle_no, class_id)
+                        SELECT :vehicleNo, :classId
+                        WHERE NOT EXISTS (SELECT id FROM vehicle WHERE vehicle_no = :vehicleNo);';
                     $stmt = $conn->prepare($sql);
                     $stmt->execute(['vehicleNo' => $vehicle[0],
-                        'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId(),
+                        'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId()]);
+                    $sql = 'INSERT INTO vehicle_user(vehicle_id,user_id)VALUES(:vehicleId,:userId)';
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute(['vehicleId' => $vehicleRepository->findByVehicleNo($vehicle[0])[0]->getId(),
                         'userId' => $user->getId()]);
                 }
             }
@@ -136,7 +142,7 @@ class RegisterController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
 
-    public function updateUser($id,Request $request, UserPasswordEncoderInterface $passwordEncoder,UrlGeneratorInterface $urlGenerator, VehicleClassRepository $vehicleClassRepository){
+    public function updateUser($id,Request $request, UserPasswordEncoderInterface $passwordEncoder,UrlGeneratorInterface $urlGenerator, VehicleClassRepository $vehicleClassRepository, VehicleRepository $vehicleRepository){
 
         $loggedUser = $this->get('security.token_storage')->getToken()->getUser()->getId();
         $vehicleClasses = $vehicleClassRepository->findAll();
@@ -198,10 +204,15 @@ class RegisterController extends AbstractController
                         $vehicle = explode("        |        ",$registeredVehicle);
                         if(!in_array($vehicle[0],$alreadyInVehicles)){
                             $sql = '
-                        INSERT INTO vehicle(vehicle_no,class_id,user_id)VALUES(:vehicleNo,:classId,:userId)';
+                        INSERT INTO vehicle (vehicle_no, class_id)
+                        SELECT :vehicleNo, :classId
+                        WHERE NOT EXISTS (SELECT id FROM vehicle WHERE vehicle_no = :vehicleNo);';
                             $stmt = $conn->prepare($sql);
                             $stmt->execute(['vehicleNo' => $vehicle[0],
-                                'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId(),
+                                'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId()]);
+                            $sql = 'INSERT INTO vehicle_user(vehicle_id,user_id)VALUES(:vehicleId,:userId)';
+                            $stmt = $conn->prepare($sql);
+                            $stmt->execute(['vehicleId' => $vehicleRepository->findByVehicleNo($vehicle[0])[0]->getId(),
                                 'userId' => $user->getId()]);
                         }
                     }
@@ -326,7 +337,7 @@ return $this->redirectToRoute('home');
        }
        foreach ($regVehicles as $regVehicle){
            if(!in_array($regVehicle, $newVehicles)){
-               $sql = 'DELETE FROM vehicle WHERE user_id=:userId AND vehicle_no=:vehicleNo;';
+               $sql = 'DELETE FROM vehicle_user WHERE user_id=:userId AND vehicle_id=(SELECT id FROM vehicle WHERE vehicle_no=:vehicleNo LIMIT 1);';
                $stmt = $conn->prepare($sql);
                $stmt->execute([
                    'vehicleNo'=> $regVehicle,
