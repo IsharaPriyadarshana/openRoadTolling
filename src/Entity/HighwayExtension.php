@@ -43,6 +43,11 @@ class HighwayExtension
     private $codeName;
 
     /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $macAddress;
+
+    /**
      * @ORM\Column(type="integer")
      */
     private $sequenceNo;
@@ -164,6 +169,18 @@ class HighwayExtension
                 $egressExtension->setEgress(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMacAddress(): ?string
+    {
+        return $this->macAddress;
+    }
+
+    public function setMacAddress(string $macAddress): self
+    {
+        $this->macAddress = $macAddress;
 
         return $this;
     }
