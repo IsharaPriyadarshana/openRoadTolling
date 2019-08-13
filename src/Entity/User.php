@@ -84,7 +84,7 @@ class User implements UserInterface
     private $idNumber;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Vehicle", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\Vehicle", mappedBy="user")
      */
     private $vehicle;
 

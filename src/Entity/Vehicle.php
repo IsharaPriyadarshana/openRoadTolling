@@ -29,7 +29,7 @@ class Vehicle
     private $highwayVehicle;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\User", inversedBy="vehicle")
+     * @ORM\ManyToOne(targetEntity="App\Entity\User", inversedBy="vehicle")
      */
     private $user;
 
