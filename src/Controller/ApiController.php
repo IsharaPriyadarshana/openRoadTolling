@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\HighwayExtension;
+use App\Entity\HighwayVehicle;
 use App\Entity\User;
 use App\Entity\Vehicle;
 use App\Repository\UserRepository;
@@ -61,14 +63,14 @@ class ApiController extends AbstractFOSRestController
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
                 if($request->get('revisionNo') != $user->getRevisionNo()){
                     $message = $this->jsonEncodeUser($user);
-                    return new RES($message,RES::HTTP_FOUND);
+                    return new RES($message,RES::HTTP_OK);
                 }else{
                     if ($user->getAccount() !=""){
                         $message = $user->getAccount()->getBalance();
                     }else{
                         $message = "Up to date!";
                     }
-                    return new RES($message,RES::HTTP_OK);
+                    return new RES($message,RES::HTTP_ACCEPTED);
                 }
 
 
@@ -97,9 +99,8 @@ class ApiController extends AbstractFOSRestController
         if (count($user)){
             $user = $user[0];
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
-
-
-                return new RES($message,RES::HTTP_FOUND);
+                $message = $this->highwayVehicle($user,$request->get('macAddress'),$request->get('vehicleNo'));
+                return new RES($message,RES::HTTP_OK);
 
             } else {
                 $message = "Invalid Credentials!";
@@ -179,11 +180,38 @@ class ApiController extends AbstractFOSRestController
     }
 
 
-public function highwayVehicle($user,$macAddress,$vehicleNo,VehicleRepository $vehicleRepository){
+public function highwayVehicle(User $user,$macAddress,$vehicleNo){
 
     $em = $this->getDoctrine()->getManager()->getRepository(Vehicle::class);
-    $vehicle = $em->findByVehicleNo('DCK7845')[0];
-    return $vehicle;
+
+    /**
+     * @var Vehicle $vehicle
+     */
+    $vehicle = $em->findByVehicleNo($vehicleNo)[0];
+
+    /**
+     * @var HighwayVehicle $highwayVehicle
+     */
+   $highwayVehicle = $this->getDoctrine()->getRepository(HighwayVehicle::class)->findByVehicle($vehicle);
+    if($highwayVehicle !=[]){
+        foreach ($highwayVehicle as $hwveh){
+            if ($hwveh->getIsCurrentlyIn() =='1'){
+                return "Vehicle Already In";
+            }
+        }
+
+    }
+        $entrance = $this->getDoctrine()->getRepository(HighwayExtension::class)->findByMacAddress($macAddress)[0];
+        $newHWvehicle = new HighwayVehicle();
+        $newHWvehicle->setVehicle($vehicle);
+        $newHWvehicle->setEntrance($entrance);
+        $newHWvehicle->setIsCurrentlyIn(1);
+        $em = $this->getDoctrine()->getManager();
+        $em->persist($newHWvehicle);
+        $em->flush();
+
+return "Vehicle Pushed";
+
 
 }
 

@@ -24,7 +24,7 @@ class Vehicle
     private $vehicleNo;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\HighwayVehicle", mappedBy="vehicle")
+     * @ORM\OneToMany(targetEntity="App\Entity\HighwayVehicle", mappedBy="vehicle")
      */
     private $highwayVehicle;
 
@@ -41,6 +41,7 @@ class Vehicle
     public function __construct()
     {
         $this->user = new ArrayCollection();
+        $this->highwayVehicle = new ArrayCollection();
     }
 
 
@@ -117,6 +118,29 @@ class Vehicle
         $newVehicle = $highwayVehicle === null ? null : $this;
         if ($newVehicle !== $highwayVehicle->getVehicle()) {
             $highwayVehicle->setVehicle($newVehicle);
+        }
+
+        return $this;
+    }
+
+    public function addHighwayVehicle(HighwayVehicle $highwayVehicle): self
+    {
+        if (!$this->highwayVehicle->contains($highwayVehicle)) {
+            $this->highwayVehicle[] = $highwayVehicle;
+            $highwayVehicle->setVehicle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHighwayVehicle(HighwayVehicle $highwayVehicle): self
+    {
+        if ($this->highwayVehicle->contains($highwayVehicle)) {
+            $this->highwayVehicle->removeElement($highwayVehicle);
+            // set the owning side to null (unless already changed)
+            if ($highwayVehicle->getVehicle() === $this) {
+                $highwayVehicle->setVehicle(null);
+            }
         }
 
         return $this;

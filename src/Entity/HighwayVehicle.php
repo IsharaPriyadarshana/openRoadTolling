@@ -17,7 +17,7 @@ class HighwayVehicle
     private $id;
 
     /**
-     * @ORM\OneToOne(targetEntity="App\Entity\Vehicle", inversedBy="highwayVehicle")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Vehicle", inversedBy="highwayVehicle")
      */
     private $vehicle;
 
