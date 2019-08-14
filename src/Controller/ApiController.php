@@ -2,19 +2,14 @@
 
 namespace App\Controller;
 use App\Entity\User;
+use App\Entity\Vehicle;
 use App\Repository\UserRepository;
+use App\Repository\VehicleRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\Annotations as FOSRest;
 use App\Entity\Article;
-use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as RES;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -39,8 +34,7 @@ class ApiController extends AbstractFOSRestController
             $user = $user[0];
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
                 $message = $this->jsonEncodeUser($user);
-                return new RES($message,RES::HTTP_FOUND);
-
+                return new RES($message);
             } else {
                 $message = "Invalid Credentials!";
                 return new RES($message,RES::HTTP_FORBIDDEN);
@@ -88,6 +82,38 @@ class ApiController extends AbstractFOSRestController
         }
 
     }
+
+
+    /**
+     * @FOSRest\Post("/get_highway_vehicle")
+     * @FOSRest\View()
+     */
+    public function postGetHighwayVehicle(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
+    {
+
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+
+
+                return new RES($message,RES::HTTP_FOUND);
+
+            } else {
+                $message = "Invalid Credentials!";
+                return new RES($message,RES::HTTP_FORBIDDEN);
+            }
+
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+    }
+
+
+
+
+
 
 //    /**
 //     * Test
@@ -152,6 +178,12 @@ class ApiController extends AbstractFOSRestController
     }
 
 
+public function highwayVehicle($user,$macAddress,$vehicleNo,VehicleRepository $vehicleRepository){
 
+    $em = $this->getDoctrine()->getManager()->getRepository(Vehicle::class);
+    $vehicle = $em->findByVehicleNo('DCK7845')[0];
+    return $vehicle;
+
+}
 
 }
