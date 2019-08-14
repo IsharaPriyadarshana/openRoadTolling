@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use FOS\RestBundle\Controller\Annotations as FOSRest;
 use App\Entity\Article;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as RES;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
@@ -34,7 +35,7 @@ class ApiController extends AbstractFOSRestController
             $user = $user[0];
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
                 $message = $this->jsonEncodeUser($user);
-                return new RES($message);
+                return new RES($message,RES::HTTP_OK);
             } else {
                 $message = "Invalid Credentials!";
                 return new RES($message,RES::HTTP_FORBIDDEN);
