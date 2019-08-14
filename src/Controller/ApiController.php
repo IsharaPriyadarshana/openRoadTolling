@@ -88,10 +88,10 @@ class ApiController extends AbstractFOSRestController
 
 
     /**
-     * @FOSRest\Post("/get_highway_vehicle")
+     * @FOSRest\Post("/push_highway_vehicle")
      * @FOSRest\View()
      */
-    public function postGetHighwayVehicle(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
+    public function postPushHighwayVehicle(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
     {
 
         $user = $userRepository->findBy(['email' => $request->get('email')]);
