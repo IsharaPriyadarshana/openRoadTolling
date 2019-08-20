@@ -282,12 +282,12 @@ class RegisterController extends AbstractController
 
         $file = $request->files->get('file');
         $currentImage = $this->get('security.token_storage')->getToken()->getUser()->getImage();
-        if($currentImage == ""){
+//        if($currentImage == ""){
 
             if($file){
                 $fileName = md5(uniqid()).'.'.$file->guessExtension();
                 $file->move(
-                    $this->getParameter('uploads_dir'), $fileName
+                    "./uploads", $fileName
                 );
                 $sql = '
                         UPDATE user
@@ -300,22 +300,22 @@ class RegisterController extends AbstractController
                     'id' => $this->get('security.token_storage')->getToken()->getUser()->getId()]);
             }
 
-        }else{
-            $myFile = $this->getParameter('uploads_dir').$currentImage;
-            try{
-                unlink($myFile);
-
-            } catch (Exception $e){
-
-            }
-            if($file){
-                $fileName = $currentImage;
-                $file->move(
-                    $this->getParameter('uploads_dir'), $fileName
-                );
-
-            }
-        }
+//        }else{
+//            $myFile = $this->getParameter('uploads_dir').$currentImage;
+//            try{
+//                unlink($myFile);
+//
+//            } catch (Exception $e){
+//
+//            }
+//            if($file){
+//                $fileName = $currentImage;
+//                $file->move(
+//                    $this->getParameter('uploads_dir'), $fileName
+//                );
+//
+//            }
+//        }
 
 return $this->redirectToRoute('home');
     }
