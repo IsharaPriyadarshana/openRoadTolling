@@ -1,2 +1,355 @@
 {% extends('base.html.twig') %}
 {% block title %}Welcome- Administrator!{% endblock %}
+{% block body %}
+
+    {{ form_start(form) }}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4">
+                <div style="margin-top: 0.5cm;"></div>
+                <h3>Vehicle Classes</h3>
+                <select multiple class="form-control" id="registeredVehicleClasses" name="vehicleClasses[]">
+                    {% if( vehicleClasses|length >0) %}
+                        {% set i=1 %}
+                        {% for vehicleClass in vehicleClasses %}
+                            <option>{{ vehicleClass.className }}        |        {{ vehicleClass.toll }}</option>
+                            <script>
+                                var input = document.createElement("input");
+                                input.setAttribute("type", "hidden");
+
+                                input.setAttribute("name", "vehicleClasses["+"{{ i }}" +"]");
+                                input.setAttribute("id", "vehicleClasses["+"{{ i }}" +"]");
+
+                                input.setAttribute("value", "{{ vehicleClass.className  }}" + "        |        " + "{{ vehicleClass.toll }}");
+                                document.getElementById('registeredVehicleClasses').appendChild(input);
+                            </script>
+                            {%  set i = i+1 %}
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="col-lg-4">
+                <div style="margin-top: 0.5cm;"></div>
+                <h3>Highways</h3>
+                <select multiple class="form-control" id="registeredHighways" name="highways[]">
+                    {% if( highways|length >0) %}
+                        {% set i=1 %}
+                        {% for highway in highways %}
+                            <option>{{ highway.name }}        |        {{ highway.codeName }}</option>
+                            <script>
+                                var input = document.createElement("input");
+
+                                input.setAttribute("type", "hidden");
+
+                                input.setAttribute("name", "highways["+"{{ i }}" +"]");
+                                input.setAttribute("id", "highways["+"{{ i }}" +"]");
+
+                                input.setAttribute("value", "{{ highway.name }}        |        {{ highway.codeName }}");
+                                document.getElementById('registeredHighways').appendChild(input);
+                            </script>
+                            {%  set i = i+1 %}
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+            <div class="col-lg-4">
+                <div style="margin-top: 0.5cm;"></div>
+                <h3>Highway Interchanges</h3>
+                <select multiple class="form-control" id="registeredHighwayExtensions" name="highwayExtensions[]">
+                    {% if( highwayExtensions|length >0) %}
+                        {% for highwayExtension in highwayExtensions %}
+                            <script>
+                                var input = document.createElement("input");
+
+                                input.setAttribute("type", "hidden");
+
+                                input.setAttribute("name", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
+                                input.setAttribute("id", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
+
+                                input.setAttribute("value", "{{ highwayExtension.name }}        |        {{ highwayExtension.codeName }}        |        {{ highwayExtension.highway.codeName }}        |        {{ highwayExtension.sequenceNo }}        |        {{ highwayExtension.macAddress }}");
+                                document.getElementById('registeredHighwayExtensions').appendChild(input);
+                            </script>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
+        </div>
+        <div style="margin-top: 0.2cm;"></div>
+
+        <div class="row">
+            <div class="col-lg-4" style="float: right;">
+                <button type="button" id="removeVehicleClass" class="btn btn-primary">Remove</button>
+            </div>
+            <div class="col-lg-4" style="float: right;">
+                <button type="button" id="removeHighway" class="btn btn-primary">Remove</button>
+            </div>
+            <div class="col-lg-4" style="float: right;">
+                <button type="button" id="removeHighwayExtension" class="btn btn-primary">Remove</button>
+            </div>
+        </div>
+    </div>
+
+
+        <div id="admin">
+            <div class="container">
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        {{ form_errors(form.className) }}
+                        {{ form_widget(form.className) }}
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.highwayName) }}
+                        {{ form_widget(form.highwayName) }}
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.highwayExtensionName) }}
+                        {{ form_widget(form.highwayExtensionName) }}
+                    </div>
+                </div>
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        {{ form_errors(form.toll) }}
+                        {{ form_widget(form.toll) }}
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.highwayCodeName) }}
+                        {{ form_widget(form.highwayCodeName) }}
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.highwayExtensionCodeName) }}
+                        {{ form_widget(form.highwayExtensionCodeName) }}
+                    </div>
+                </div>
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <button type="button" id="addVehicleClass" class="btn btn-primary">Add</button>
+                    </div>
+                    <div class="col-lg-4">
+                        <button type="button" id="addHighway" class="btn btn-primary">Add</button>
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.sequenceNo) }}
+                        {{ form_widget(form.sequenceNo) }}
+                    </div>
+                </div>
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.macAddress) }}
+                        {{ form_widget(form.macAddress) }}
+                    </div>
+                </div>
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                        <button type="button" id="addHighwayExtension" class="btn btn-primary">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    <div style="margin-top: 0.5cm;"></div>
+    <div class="row">
+        <div class="col-lg-5"></div>
+        <div class="col-lg-2">{{ form_widget(form.save) }}</div>
+        <div class="col-lg-5"></div>
+    </div>
+
+    {{ form_row(form._token) }}
+    {{ form_errors(form) }}
+
+    </form>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        const addVehicleClassButton = document.getElementById('addVehicleClass');
+        const className = document.getElementById('admin_className');
+        const toll = document.getElementById('admin_toll');
+        const addedVehicleClasses = document.getElementById('registeredVehicleClasses');
+        const removeVehicleClassButton = document.getElementById('removeVehicleClass');
+        addVehicleClassButton.addEventListener("click", function () {
+            var opt = document.createElement('option');
+            opt.value = className.value + "        |        " + toll.value ;
+            opt.innerHTML = className.value + "        |        " + toll.value;
+            var existingOptions = addedVehicleClasses.options;
+            var isExist = false;
+
+            for(var i=0;i<existingOptions.length;i++){
+                if(existingOptions[i].value == opt.value){
+                    isExist = true;
+                }
+            }
+
+
+            if(isExist == false){
+                addedVehicleClasses.appendChild(opt);
+
+                var input = document.createElement("input");
+
+                input.setAttribute("type", "hidden");
+
+                input.setAttribute("name", "vehicleClasses["+addedVehicleClasses.length +"]");
+                input.setAttribute("id", "vehicleClasses["+addedVehicleClasses.length +"]");
+
+                input.setAttribute("value", className.value + "        |        " + toll.value);
+                addedVehicleClasses.appendChild(input);
+            }
+            className.value="";
+            toll.value="";
+
+        });
+        removeVehicleClassButton.addEventListener("click",function () {
+            try{
+                var options = addedVehicleClasses.getElementsByTagName('OPTION');
+                document.getElementById( "vehicleClasses["+(addedVehicleClasses.selectedIndex+1)+"]").remove();
+                addedVehicleClasses.removeChild(options[addedVehicleClasses.selectedIndex]);
+            }catch (e) {
+
+            }
+        });
+    </script>
+    <script>
+        const addHighwayButton = document.getElementById('addHighway');
+        const highwayCodeName = document.getElementById('admin_highwayCodeName');
+        const highwayName = document.getElementById('admin_highwayName');
+        const addedHighways = document.getElementById('registeredHighways');
+        const removeHighwayButton = document.getElementById('removeHighway');
+        const addedHighwayExtensions = document.getElementById("registeredHighwayExtensions");
+
+        addHighwayButton.addEventListener("click", function () {
+            var opt = document.createElement('option');
+            opt.value = highwayName.value + "        |        " + highwayCodeName.value ;
+            opt.innerHTML = highwayName.value + "        |        " + highwayCodeName.value;
+            var existingOptions = addedHighways.options;
+            var isExist = false;
+
+            for(var i=0;i<existingOptions.length;i++){
+                if(existingOptions[i].value == opt.value){
+                    isExist = true;
+                }
+            }
+
+
+            if(isExist == false){
+                addedHighways.appendChild(opt);
+
+                var input = document.createElement("input");
+
+                input.setAttribute("type", "hidden");
+
+                input.setAttribute("name", "highways["+addedHighways.length +"]");
+                input.setAttribute("id", "highways["+addedHighways.length +"]");
+
+                input.setAttribute("value", highwayName.value + "        |        " + highwayCodeName.value);
+                addedHighways.appendChild(input);
+            }
+            highwayName.value="";
+            highwayCodeName.value="";
+
+        });
+        removeHighwayButton.addEventListener("click",function () {
+            try{
+                var options = addedHighways.getElementsByTagName('OPTION');
+                document.getElementById( "highways["+(addedHighways.selectedIndex+1)+"]").remove();
+                addedHighways.removeChild(options[addedHighways.selectedIndex]);
+            }catch (e) {
+
+            }
+        });
+
+        addedHighways.addEventListener("click",function () {
+            addedHighwayExtensions.options.length=0;
+            var selectedHighway = document.getElementById("highways["+(addedHighways.selectedIndex+1)+"]").value;
+            selectedHighway = selectedHighway.split("        |        ")[1];
+            var allInputs = document.getElementsByTagName("input");
+            for(var k=0;k<allInputs.length;k++){
+                if (allInputs[k].name.substring(0,17) == "highwayExtensions"){
+                    var element = document.getElementById(allInputs[k].name);
+                    if(element.value.split("        |        ")[2] == selectedHighway ){
+                        var opt = document.createElement('option');
+                        opt.value = element.value;
+                        opt.innerHTML = element.value.split("        |        ")[0] + "        |        " + element.value.split("        |        ")[3]  + "        |        " + element.value.split("        |        ")[4];
+                        addedHighwayExtensions.appendChild(opt);
+                    }
+
+                }
+            }
+
+
+        });
+
+    </script>
+    <script>
+        const addHighwayExtensionButton = document.getElementById('addHighwayExtension');
+        const highwayExtensionName = document.getElementById('admin_highwayExtensionName');
+        const highwayExtensionCodeName = document.getElementById('admin_highwayExtensionCodeName');
+        const sequenceNo = document.getElementById('admin_sequenceNo');
+        const macAddress = document.getElementById('admin_macAddress');
+        const removeHighwayExtensionButton = document.getElementById('removeHighwayExtension');
+        addHighwayExtensionButton.addEventListener("click", function () {
+            var selectedHighway = document.getElementById("highways["+(addedHighways.selectedIndex+1)+"]").value;
+            selectedHighway = selectedHighway.split("        |        ")[1];
+            var opt = document.createElement('option');
+            opt.value = highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value ;
+            opt.innerHTML = highwayExtensionName.value + "        |        " + sequenceNo.value + "        |        " + macAddress.value;
+            var existingOptions = addedHighwayExtensions.options;
+            var isExist = false;
+
+            for(var i=0;i<existingOptions.length;i++){
+                if(existingOptions[i].value == opt.value){
+                    isExist = true;
+                }
+            }
+
+
+            if(isExist == false){
+                addedHighwayExtensions.appendChild(opt);
+
+                var input = document.createElement("input");
+
+                input.setAttribute("type", "hidden");
+
+                input.setAttribute("name", "highwayExtensions["+ highwayExtensionCodeName.value +"]");
+                input.setAttribute("id", "highwayExtensions["+ highwayExtensionCodeName.value +"]");
+
+                input.setAttribute("value", highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value );
+                addedHighwayExtensions.appendChild(input);
+            }
+            highwayExtensionName.value="";
+            highwayExtensionCodeName.value="";
+            sequenceNo.value="";
+            macAddress.value="";
+
+        });
+        removeHighwayExtensionButton.addEventListener("click",function () {
+            try{
+                var options = addedHighwayExtensions.getElementsByTagName('OPTION');
+                document.getElementById( "highwayExtensions["+options[addedHighwayExtensions.selectedIndex].value.split("        |        ")[1]+"]").remove();
+                addedHighwayExtensions.removeChild(options[addedHighwayExtensions.selectedIndex]);
+            }catch (e) {
+
+            }
+        });
+    </script>
+
+
+
+
+
+
+{% endblock %}

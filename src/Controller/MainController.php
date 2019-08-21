@@ -2,8 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\Highway;
+use App\Entity\HighwayExtension;
 use App\Entity\User;
+use App\Entity\VehicleClass;
+use App\Form\AdminType;
+use App\Form\RegisterType;
+use App\Repository\HighwayExtensionRepository;
+use App\Repository\HighwayRepository;
+use App\Repository\VehicleClassRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -48,6 +57,7 @@ class MainController extends AbstractController
             }else{
                 $photoSrc =  "/uploads/".$user->getImage();
             }
+
             return $this->render('main/home.html.twig',[
                 'photoSrc' => $photoSrc,
                 'user' => $user,
@@ -63,10 +73,191 @@ class MainController extends AbstractController
     /**
      * @Route("/admin", name="admin")
      */
-    public function admin(){
+    public function admin(Request $request,VehicleClassRepository $vehicleClassRepository, HighwayRepository $highwayRepository,HighwayExtensionRepository $highwayExtensionRepository, UrlGeneratorInterface $urlGenerator){
+        $conn = $this->getDoctrine()->getManager()->getConnection();
+        $vehicleClasses = $vehicleClassRepository->findAll();
+        $highways = $highwayRepository->findAll();
+        $highwayExtensions = $highwayExtensionRepository->findAll();
 
-        return $this->render('main/admin.html.twig',[
+        $form = $this->createForm(AdminType::class);
+        $form->handleRequest($request);
+
+
+        if($form->isSubmitted() && $form->isValid()) {
+//            dump($request->request);die;
+
+            if(isset($request->request->all()['vehicleClasses'])){
+                $registeredVehicleClasses = $request->request->all()['vehicleClasses'];
+                $this->removeVehicleClasses($registeredVehicleClasses);
+                $alreadyInVehicleClasses = $this->getVehicleClasses();
+                foreach ($registeredVehicleClasses as $registeredVehicleClass){
+                    $vehicleClass = explode("        |        ",$registeredVehicleClass);
+                    if(!in_array($vehicleClass[0],$alreadyInVehicleClasses)){
+                        $sql = '
+                        INSERT INTO vehicle_class (class_name, toll)
+                        VALUES (:className,:toll);';
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute(['className' => $vehicleClass[0],
+                            'toll' => $vehicleClass[1]]);
+                    }
+                }
+            }else{
+                $this->removeVehicleClasses(array());
+            }
+
+            if(isset($request->request->all()['highways'])){
+                $registeredHighways = $request->request->all()['highways'];
+                $this->removeHighways($registeredHighways);
+                $alreadyInHighways = $this->getHighways();
+                foreach ($registeredHighways as $registeredHighway){
+                    $highway = explode("        |        ",$registeredHighway);
+                    if(sizeof($highway)==2){
+                        if(!in_array($highway[1],$alreadyInHighways)){
+                            $sql = '
+                        INSERT INTO highway (name, code_name)
+                        VALUES (:name,:code_name);';
+                            $stmt = $conn->prepare($sql);
+                            $stmt->execute(['name' => $highway[0],
+                                'code_name' => $highway[1]]);
+                        }
+                    }
+                }
+            }else{
+                $this->removeHighways(array());
+            }
+
+            if(isset($request->request->all()['highwayExtensions'])){
+                $registeredHighwayExtensions = $request->request->all()['highwayExtensions'];
+                $this->removeHighwayExtensions($registeredHighwayExtensions);
+                $alreadyInHighwayExtensions = $this->getHighwayExtensions();
+                foreach ($registeredHighwayExtensions as $registeredHighwayExtension){
+                    $highwayExtension = explode("        |        ",$registeredHighwayExtension);
+                    if(!in_array($highwayExtension[1],$alreadyInHighwayExtensions)){
+                        $sql = '
+                        INSERT INTO highway_extension (highway_id,name, code_name,sequence_no,mac_address)
+                        VALUES ((SELECT id FROM highway WHERE code_name=:highway),:name,:code_name,:sequence_no,:mac_address);';
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute(['highway' => $highwayExtension[2],
+                            'name' => $highwayExtension[0],
+                            'code_name' => $highwayExtension[1],
+                            'sequence_no' => $highwayExtension[3],
+                            'mac_address' => $highwayExtension[4]]);
+                    }
+                }
+            }else{
+                $this->removeHighwayExtensions(array());
+            }
+
+
+
+            return new RedirectResponse($urlGenerator->generate('admin'));
+
+        }
+
+            return $this->render('main/admin.html.twig',[
+            'form'=>$form->createView(),
+            'vehicleClasses' => $vehicleClasses,
+            'highways' => $highways,
+            'highwayExtensions' => $highwayExtensions
            ]);
     }
+
+    public function getHighwayExtensions(){
+        $highwayExtensionObjects = $this->getDoctrine()->getRepository(HighwayExtension::class)->findAll();
+        $highwayExtensions = array();
+        foreach ($highwayExtensionObjects as $highwayExtensionObject){
+            $highwayExtensions[]=$highwayExtensionObject->getCodeName();
+        }
+        return $highwayExtensions;
+    }
+
+    public function removeHighwayExtensions($highwayExtensions){
+        $conn = $this->getDoctrine()->getManager()->getConnection();
+        $regHighwayExtensions= $this->getHighwayExtensions();
+        $newHighwayExtensions = array();
+        foreach ($highwayExtensions as $highwayExtension){
+            $newHighwayExtensions[]= explode("        |        ",$highwayExtension)[1];
+        }
+        foreach ($regHighwayExtensions as $regHighwayExtension){
+            if(!in_array($regHighwayExtension, $newHighwayExtensions)){
+                $sql = 'DELETE FROM highway_extension WHERE code_name=:codeName;';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    'codeName'=> $regHighwayExtension]);
+            }
+        }
+    }
+
+
+
+
+    public function getHighways(){
+        $highwayObjects = $this->getDoctrine()->getRepository(Highway::class)->findAll();
+        $highways = array();
+        foreach ($highwayObjects as $highwayObject){
+            $highways[]=$highwayObject->getCodeName();
+        }
+        return $highways;
+    }
+
+    public function removeHighways($highways){
+        $conn = $this->getDoctrine()->getManager()->getConnection();
+        $regHighways= $this->getHighways();
+        $newHighways = array();
+        foreach ($highways as $highway){
+            if(sizeof(explode("        |        ",$highway))==2) {
+                $newHighways[] = explode("        |        ", $highway)[1];
+            }
+        }
+        foreach ($regHighways as $regHighway){
+            if(!in_array($regHighway, $newHighways)){
+                $sql = 'DELETE FROM highway_extension WHERE highway_id = (SELECT  id FROM highway WHERE code_name=:codeName);';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    'codeName'=> $regHighway]);
+
+                $sql = 'DELETE FROM highway WHERE code_name=:codeName;';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    'codeName'=> $regHighway]);
+            }
+        }
+    }
+
+
+
+
+    public function getVehicleClasses(){
+        $vehicleClassObjects = $this->getDoctrine()->getRepository(VehicleClass::class)->findAll();
+        $vehicleClasses = array();
+        foreach ($vehicleClassObjects as $vehicleClassObject){
+            $vehicleClasses[]=$vehicleClassObject->getClassName();
+        }
+        return $vehicleClasses;
+    }
+
+    public function removeVehicleClasses($vehicleClasses){
+        $conn = $this->getDoctrine()->getManager()->getConnection();
+        $regVehicleClasses= $this->getVehicleClasses();
+        $newVehicleClasses = array();
+        foreach ($vehicleClasses as $vehicleClass){
+            $newVehicleClasses[]= explode("        |        ",$vehicleClass)[0];
+        }
+        foreach ($regVehicleClasses as $regVehicleClass){
+            if(!in_array($regVehicleClass, $newVehicleClasses)){
+                $sql = 'UPDATE vehicle SET class_id=null WHERE class_id=(SELECT id FROM vehicle_class WHERE class_name=:className);';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    'className'=> $regVehicleClass]);
+
+                $sql = 'DELETE FROM vehicle_class WHERE class_name=:className;';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    'className'=> $regVehicleClass]);
+            }
+        }
+    }
+
+
 
 }

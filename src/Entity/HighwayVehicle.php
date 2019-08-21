@@ -36,6 +36,16 @@ class HighwayVehicle
     private $toll;
 
     /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $enterTime;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $exitTime;
+
+    /**
      * @ORM\Column(type="boolean")
      */
     private $isCurrentlyIn;
@@ -102,6 +112,30 @@ class HighwayVehicle
     public function setEgress(?HighwayExtension $egress): self
     {
         $this->egress = $egress;
+
+        return $this;
+    }
+
+    public function getEnterTime(): ?string
+    {
+        return $this->enterTime;
+    }
+
+    public function setEnterTime(?string $enterTime): self
+    {
+        $this->enterTime = $enterTime;
+
+        return $this;
+    }
+
+    public function getExitTime(): ?string
+    {
+        return $this->exitTime;
+    }
+
+    public function setExitTime(?string $exitTime): self
+    {
+        $this->exitTime = $exitTime;
 
         return $this;
     }
