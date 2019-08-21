@@ -68,9 +68,9 @@ class ApiController extends AbstractFOSRestController
                     if ($user->getAccount() !=""){
                         $message = json_encode(["balance" => $user->getAccount()->getBalance()]);
                     }else{
-                        $message = "Up to date!";
+                        $message = json_encode(["balance" => '0']);
                     }
-                    return new RES($message,RES::HTTP_OK);
+                    return new RES($message,RES::HTTP_ACCEPTED);
                 }
 
 
