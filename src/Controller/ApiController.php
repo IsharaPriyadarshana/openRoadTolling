@@ -70,7 +70,7 @@ class ApiController extends AbstractFOSRestController
                     }else{
                         $message = "Up to date!";
                     }
-                    return new RES($message,RES::HTTP_ACCEPTED);
+                    return new RES($message,RES::HTTP_OK);
                 }
 
 
@@ -170,6 +170,10 @@ class ApiController extends AbstractFOSRestController
         $path = $this->getParameter('uploads_dir').$user->getImage();
         $type = pathinfo($path, PATHINFO_EXTENSION);
         $data = file_get_contents($path);
+        if($data ==""){
+            $type = "svg";
+            $data = file_get_contents($this->getParameter('uploads_dir')."/../images/login.svg");
+        }
         $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
 
         $jsonUser["image"] = $base64;
