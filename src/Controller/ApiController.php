@@ -5,6 +5,7 @@ use App\Entity\HighwayExtension;
 use App\Entity\HighwayVehicle;
 use App\Entity\User;
 use App\Entity\Vehicle;
+use App\Repository\HighwayExtensionRepository;
 use App\Repository\UserRepository;
 use App\Repository\VehicleRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
@@ -53,6 +54,10 @@ class ApiController extends AbstractFOSRestController
     /**
      * @FOSRest\Post("/update_user")
      * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return RES
      */
     public function postUpdateUserAction(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -90,6 +95,10 @@ class ApiController extends AbstractFOSRestController
     /**
      * @FOSRest\Post("/push_highway_vehicle")
      * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return RES
      */
     public function postPushHighwayVehicle(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
     {
@@ -112,8 +121,40 @@ class ApiController extends AbstractFOSRestController
         }
     }
 
+    /**
+     * @FOSRest\Post("/get_mac_addresses")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param HighwayExtensionRepository $highwayExtensionRepository
+     * @return RES
+     */
+    public function getMacAddresses(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, HighwayExtensionRepository $highwayExtensionRepository){
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+                $extensions =$highwayExtensionRepository->findAll();
+                $macAddresses = array();
+                foreach ($extensions as $extension){
+                    $macs = unserialize($extension->getMacAddress());
+                    foreach ($macs as $mac){
+                        $macAddresses[]=$mac;
+                    }
+                }
+                $message = json_encode($macAddresses);
+                return new RES($message,RES::HTTP_OK);
 
+            } else {
+                $message = "Invalid Credentials!";
+                return new RES($message,RES::HTTP_FORBIDDEN);
+            }
 
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+    }
 
 
 

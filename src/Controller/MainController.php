@@ -132,6 +132,8 @@ class MainController extends AbstractController
                 $alreadyInHighwayExtensions = $this->getHighwayExtensions();
                 foreach ($registeredHighwayExtensions as $registeredHighwayExtension){
                     $highwayExtension = explode("        |        ",$registeredHighwayExtension);
+                    $macAddresses = explode(",",$highwayExtension[4]);
+                    $macAddresses = serialize($macAddresses);
                     if(!in_array($highwayExtension[1],$alreadyInHighwayExtensions)){
                         $sql = '
                         INSERT INTO highway_extension (highway_id,name, code_name,sequence_no,mac_address)
@@ -141,7 +143,7 @@ class MainController extends AbstractController
                             'name' => $highwayExtension[0],
                             'code_name' => $highwayExtension[1],
                             'sequence_no' => $highwayExtension[3],
-                            'mac_address' => $highwayExtension[4]]);
+                            'mac_address' => $macAddresses]);
                     }
                 }
             }else{
