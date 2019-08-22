@@ -72,6 +72,11 @@ class User implements UserInterface
     private $phoneNumber;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\HighwayVehicle", mappedBy="user")
+     */
+    private $highwayVehicle;
+
+    /**
      * @ORM\Column(type="string",length=10, nullable=true)
      */
     private $revisionNo;
@@ -284,6 +289,24 @@ class User implements UserInterface
     public function setRevisionNo(string $revisionNo): self
     {
         $this->revisionNo = $revisionNo;
+
+        return $this;
+    }
+
+    public function getHighwayVehicle(): ?HighwayVehicle
+    {
+        return $this->highwayVehicle;
+    }
+
+    public function setHighwayVehicle(?HighwayVehicle $highwayVehicle): self
+    {
+        $this->highwayVehicle = $highwayVehicle;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newUser = $highwayVehicle === null ? null : $this;
+        if ($newUser !== $highwayVehicle->getUser()) {
+            $highwayVehicle->setUser($newUser);
+        }
 
         return $this;
     }

@@ -41,9 +41,19 @@ class HighwayVehicle
     private $enterTime;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\User", inversedBy="highwayVehicle")
+     */
+    private $user;
+
+    /**
      * @ORM\Column(type="string", nullable=true)
      */
     private $exitTime;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $drivedBy;
 
     /**
      * @ORM\Column(type="boolean")
@@ -136,6 +146,30 @@ class HighwayVehicle
     public function setExitTime(?string $exitTime): self
     {
         $this->exitTime = $exitTime;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getDrivedBy(): ?string
+    {
+        return $this->drivedBy;
+    }
+
+    public function setDrivedBy(?string $drivedBy): self
+    {
+        $this->drivedBy = $drivedBy;
 
         return $this;
     }
