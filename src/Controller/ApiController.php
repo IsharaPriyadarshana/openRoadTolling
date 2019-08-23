@@ -460,7 +460,7 @@ class ApiController extends AbstractFOSRestController
         for ($i = 0; $i < (25-strlen($extensionCodeName)); $i++) {
             $ssid .= $characters[rand(0, $charactersLength - 1)];
         }
-        $prefix = "ORT@#HWS";
+        $prefix = "ORT@#HW";
         return $prefix.$extensionCodeName.$ssid;
 
     }
