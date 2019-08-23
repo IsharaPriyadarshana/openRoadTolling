@@ -192,9 +192,8 @@ class ApiController extends AbstractFOSRestController
                 $extensions =$highwayExtensionRepository->findAll();
                 $macAddresses = array();
                 foreach ($extensions as $extension){
-                    $macs = unserialize($extension->getMacAddress());
-                    foreach ($macs as $mac){
-                        $macAddresses[]=$mac;
+                    foreach ($extension->getAccessPoint() as $ap){
+                        $macAddresses[] = $ap->getMacAddress();
                     }
                 }
                 $message = json_encode(["macAddresses"=>$macAddresses]);
