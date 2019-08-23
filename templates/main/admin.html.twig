@@ -67,7 +67,7 @@
                                 input.setAttribute("name", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
                                 input.setAttribute("id", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
 
-                                input.setAttribute("value", "{{ highwayExtension.name }}        |        {{ highwayExtension.codeName }}        |        {{ highwayExtension.highway.codeName }}        |        {{ highwayExtension.sequenceNo }}        |        {{ highwayExtension.macAddress }}");
+                                input.setAttribute("value", "{{ highwayExtension.name }}        |        {{ highwayExtension.codeName }}        |        {{ highwayExtension.highway.codeName }}        |        {{ highwayExtension.sequenceNo }}");
                                 document.getElementById('registeredHighwayExtensions').appendChild(input);
                             </script>
                         {% endfor %}
@@ -134,6 +134,28 @@
                     <div class="col-lg-4">
                         {{ form_errors(form.sequenceNo) }}
                         {{ form_widget(form.sequenceNo) }}
+                    </div>
+                </div>
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.apNames) }}
+                        {{ form_widget(form.apNames) }}
+                    </div>
+                </div>
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                        {{ form_errors(form.accessKey) }}
+                        {{ form_widget(form.accessKey) }}
                     </div>
                 </div>
                 <div style="margin-top: 0.5cm;"></div>
@@ -283,7 +305,7 @@
                     if(element.value.split("        |        ")[2] == selectedHighway ){
                         var opt = document.createElement('option');
                         opt.value = element.value;
-                        opt.innerHTML = element.value.split("        |        ")[0] + "        |        " + element.value.split("        |        ")[3]  + "        |        " + element.value.split("        |        ")[4];
+                        opt.innerHTML = element.value.split("        |        ")[0] + "        |        " + element.value.split("        |        ")[3];
                         addedHighwayExtensions.appendChild(opt);
                     }
 
@@ -300,13 +322,15 @@
         const highwayExtensionCodeName = document.getElementById('admin_highwayExtensionCodeName');
         const sequenceNo = document.getElementById('admin_sequenceNo');
         const macAddress = document.getElementById('admin_macAddress');
+        const apNames = document.getElementById('admin_apNames');
+        const accessKey = document.getElementById('admin_accessKey');
         const removeHighwayExtensionButton = document.getElementById('removeHighwayExtension');
         addHighwayExtensionButton.addEventListener("click", function () {
             var selectedHighway = document.getElementById("highways["+(addedHighways.selectedIndex+1)+"]").value;
             selectedHighway = selectedHighway.split("        |        ")[1];
             var opt = document.createElement('option');
-            opt.value = highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value ;
-            opt.innerHTML = highwayExtensionName.value + "        |        " + sequenceNo.value + "        |        " + macAddress.value;
+            opt.value = highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value  + "        |        " + apNames.value  + "        |        " + accessKey.value;
+            opt.innerHTML = highwayExtensionName.value + "        |        " + sequenceNo.value;
             var existingOptions = addedHighwayExtensions.options;
             var isExist = false;
 
@@ -327,13 +351,15 @@
                 input.setAttribute("name", "highwayExtensions["+ highwayExtensionCodeName.value +"]");
                 input.setAttribute("id", "highwayExtensions["+ highwayExtensionCodeName.value +"]");
 
-                input.setAttribute("value", highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value );
+                input.setAttribute("value", highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value + "        |        " + apNames.value+ "        |        " + accessKey.value );
                 addedHighwayExtensions.appendChild(input);
             }
             highwayExtensionName.value="";
             highwayExtensionCodeName.value="";
             sequenceNo.value="";
             macAddress.value="";
+            apNames.value="";
+            accessKey.value="";
 
         });
         removeHighwayExtensionButton.addEventListener("click",function () {
@@ -345,6 +371,7 @@
 
             }
         });
+
     </script>
 
 

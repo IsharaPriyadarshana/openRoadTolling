@@ -29,7 +29,7 @@ class Highway
     private $highwayExtension;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=8)
      */
     private $codeName;
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\AccessPoint;
 use App\Entity\Highway;
 use App\Entity\HighwayExtension;
 use App\Entity\User;
@@ -74,6 +75,7 @@ class MainController extends AbstractController
      * @Route("/admin", name="admin")
      */
     public function admin(Request $request,VehicleClassRepository $vehicleClassRepository, HighwayRepository $highwayRepository,HighwayExtensionRepository $highwayExtensionRepository, UrlGeneratorInterface $urlGenerator){
+        $em = $this->getDoctrine()->getManager();
         $conn = $this->getDoctrine()->getManager()->getConnection();
         $vehicleClasses = $vehicleClassRepository->findAll();
         $highways = $highwayRepository->findAll();
@@ -92,15 +94,16 @@ class MainController extends AbstractController
                 $alreadyInVehicleClasses = $this->getVehicleClasses();
                 foreach ($registeredVehicleClasses as $registeredVehicleClass){
                     $vehicleClass = explode("        |        ",$registeredVehicleClass);
+
                     if(!in_array($vehicleClass[0],$alreadyInVehicleClasses)){
-                        $sql = '
-                        INSERT INTO vehicle_class (class_name, toll)
-                        VALUES (:className,:toll);';
-                        $stmt = $conn->prepare($sql);
-                        $stmt->execute(['className' => $vehicleClass[0],
-                            'toll' => $vehicleClass[1]]);
+
+                        $class = new VehicleClass();
+                        $class->setClassName($vehicleClass[0]);
+                        $class->setToll($vehicleClass[1]);
+                        $em->persist($class);
                     }
                 }
+                $em->flush();
             }else{
                 $this->removeVehicleClasses(array());
             }
@@ -113,14 +116,14 @@ class MainController extends AbstractController
                     $highway = explode("        |        ",$registeredHighway);
                     if(sizeof($highway)==2){
                         if(!in_array($highway[1],$alreadyInHighways)){
-                            $sql = '
-                        INSERT INTO highway (name, code_name)
-                        VALUES (:name,:code_name);';
-                            $stmt = $conn->prepare($sql);
-                            $stmt->execute(['name' => $highway[0],
-                                'code_name' => $highway[1]]);
+                            $hw = new Highway();
+                            $hw->setName($highway[0]);
+                            $hw->setCodeName($highway[1]);
+                            $em->persist($hw);
+
                         }
                     }
+                    $em->flush();
                 }
             }else{
                 $this->removeHighways(array());
@@ -132,19 +135,30 @@ class MainController extends AbstractController
                 $alreadyInHighwayExtensions = $this->getHighwayExtensions();
                 foreach ($registeredHighwayExtensions as $registeredHighwayExtension){
                     $highwayExtension = explode("        |        ",$registeredHighwayExtension);
-                    $macAddresses = explode(",",$highwayExtension[4]);
-                    $macAddresses = serialize($macAddresses);
-                    if(!in_array($highwayExtension[1],$alreadyInHighwayExtensions)){
-                        $sql = '
-                        INSERT INTO highway_extension (highway_id,name, code_name,sequence_no,mac_address)
-                        VALUES ((SELECT id FROM highway WHERE code_name=:highway),:name,:code_name,:sequence_no,:mac_address);';
-                        $stmt = $conn->prepare($sql);
-                        $stmt->execute(['highway' => $highwayExtension[2],
-                            'name' => $highwayExtension[0],
-                            'code_name' => $highwayExtension[1],
-                            'sequence_no' => $highwayExtension[3],
-                            'mac_address' => $macAddresses]);
-                    }
+                   if(sizeof($highwayExtension)==7){
+                       $macAddresses = explode(",",$highwayExtension[4]);
+                       $apNames = explode(",",$highwayExtension[5]);
+                       if(!in_array($highwayExtension[1],$alreadyInHighwayExtensions)){
+                           $hway = $this->getDoctrine()->getRepository(Highway::class)->findByCodeName($highwayExtension[2])[0];
+                           $exchange = new HighwayExtension();
+                           $exchange->setName($highwayExtension[0]);
+                           $exchange->setCodeName($highwayExtension[1]);
+                           $exchange->setSequenceNo($highwayExtension[3]);
+                           $exchange->setAccessKey($highwayExtension[6]);
+                           $exchange->setHighway($hway);
+                           $em->persist($exchange);
+                           $em->flush();
+                           for($i=0;$i<sizeof($macAddresses);$i++){
+                               $ap = new AccessPoint();
+                               $ap->setName($apNames[$i]);
+                               $ap->setMacAddress($macAddresses[$i]);
+                               $ap->setHighwayExtension($exchange);
+                               $em->persist($ap);
+                               $em->flush();
+                           }
+
+                       }
+                   }
                 }
             }else{
                 $this->removeHighwayExtensions(array());

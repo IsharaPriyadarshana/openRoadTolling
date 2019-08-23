@@ -1,13 +1,17 @@
 <?php
 
 namespace App\Controller;
+use App\Entity\AccessPoint;
+use App\Entity\Highway;
 use App\Entity\HighwayExtension;
 use App\Entity\HighwayVehicle;
 use App\Entity\User;
 use App\Entity\Vehicle;
+use App\Repository\AccessPointRepository;
 use App\Repository\HighwayExtensionRepository;
 use App\Repository\HighwayVehicleRepository;
 use App\Repository\UserRepository;
+use App\Repository\VehicleClassRepository;
 use App\Repository\VehicleRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
@@ -127,7 +131,7 @@ class ApiController extends AbstractFOSRestController
                     $highwayVehicle->setIsCurrentlyIn(1);
                     $em->persist($highwayVehicle);
                     $em->flush();
-                    $message = json_encode($this->getExtension($macAddress)->getName());
+                    $message = json_encode(["entrance" =>$this->getExtension($macAddress)->getName()]);
                 }else{
                     /**
                      * @var HighwayVehicle $isIn
@@ -142,7 +146,7 @@ class ApiController extends AbstractFOSRestController
                         $highwayVehicle->setIsCurrentlyIn(1);
                         $em->persist($highwayVehicle);
                         $em->flush();
-                        $message = json_encode($this->getExtension($macAddress)->getName());
+                        $message = json_encode(["entrance" =>$this->getExtension($macAddress)->getName()]);
                     }else{
                         /**
                          * @var HighwayVehicle $highwayVehicle
@@ -154,7 +158,7 @@ class ApiController extends AbstractFOSRestController
                         $highwayVehicle->setIsCurrentlyIn(0);
                         $highwayVehicle->setUser(null);
                         $em->flush();
-                        $message = json_encode([$this->getExtension($macAddress)->getName(),$highwayVehicle->getToll()]);
+                        $message = json_encode(["exit"=>$this->getExtension($macAddress)->getName(),"toll"=>$highwayVehicle->getToll()]);
                     }
                 }
 
@@ -193,7 +197,7 @@ class ApiController extends AbstractFOSRestController
                         $macAddresses[]=$mac;
                     }
                 }
-                $message = json_encode($macAddresses);
+                $message = json_encode(["macAddresses"=>$macAddresses]);
                 return new RES($message,RES::HTTP_OK);
 
             } else {
@@ -207,6 +211,167 @@ class ApiController extends AbstractFOSRestController
     }
 
 
+    /**
+     * Test
+     * @FOSRest\Post("/register_vehicle")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param VehicleClassRepository $vehicleClassRepository
+     * @param VehicleRepository $vehicleRepository
+     * @return RES
+     */
+    public function postRegisterVehicle(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder,VehicleClassRepository $vehicleClassRepository, VehicleRepository $vehicleRepository)
+    {
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+                $em = $this->getDoctrine()->getManager();
+                $conn =$em->getConnection();
+                $class = $vehicleClassRepository->findByClassName($request->get('className'))[0];
+                $vehicleNo = $request->get('vehicleNo');
+                $vehicle = $vehicleRepository->findByVehicleNo($vehicleNo);
+
+                if(sizeof($vehicle)==0){
+                    $vehicle = new Vehicle();
+                    $vehicle->setClass($class);
+                    $vehicle->setVehicleNo($vehicleNo);
+                    $vehicle->addUser($user);
+                    $em->persist($vehicle);
+                    $em->flush();
+                }else{
+                    $vehicle= $vehicle[0];
+                    $vehicle->addUser($user);
+                    $em->flush();
+                }
+
+
+
+
+                return new RES("",RES::HTTP_OK);
+
+            } else {
+                $message = "Invalid Credentials!";
+            }
+
+            return new RES($message,RES::HTTP_FOUND);
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+
+    }
+
+    /**
+     * Test
+     * @FOSRest\Post("/get_vehicle_classes")
+     * @FOSRest\View()
+     */
+    public function postGetVehicleClasses(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, VehicleClassRepository $vehicleClassRepository)
+    {
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+
+                $vehicleClasses = $vehicleClassRepository->findAll();
+                $classNames = array();
+                foreach ($vehicleClasses as $vehicleClass){
+                    $classNames[] = $vehicleClass->getClassName();
+                }
+                return new RES(json_encode(["vehicleClasses"=>$classNames]),RES::HTTP_OK);
+            } else {
+                $message = "Invalid Credentials!";
+            }
+
+            return new RES($message,RES::HTTP_FOUND);
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+
+    }
+
+
+    /**
+     * Test
+     * @FOSRest\Post("/update_ssid")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param HighwayExtensionRepository $highwayExtensionRepository
+     * @return RES
+     */
+    public function postUpdateSSID(Request $request,  HighwayExtensionRepository $highwayExtensionRepository)
+    {
+        /**
+         * @var HighwayExtension $extension
+         */
+        $extension = $highwayExtensionRepository->findByCodeName($request->get('codeName'))[0];
+
+        if ($extension->getAccessKey() == $request->get('accessKey')){
+            $message = json_encode(["ssid"=>$this->sssidGenerator($extension->getCodeName())]);
+            return new RES($message,RES::HTTP_OK);
+
+
+        } else {
+            $message = "Invalid AccessKey!";
+            return new RES($message,RES::HTTP_NOT_FOUND);
+
+        }
+
+    }
+
+
+    /**
+     * Test
+     * @FOSRest\Post("/update_ssid_ack")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param HighwayExtensionRepository $highwayExtensionRepository
+     * @param AccessPointRepository $accessPointRepository
+     * @return RES
+     */
+    public function postUpdateSSIDAck(Request $request,  HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $conn =$em->getConnection();
+
+        $extension = $highwayExtensionRepository->findByCodeName($request->get('codeName'))[0];
+        /**
+         * @var AccessPoint $accessPoint
+         */
+        $accessPoint = $accessPointRepository->findByName($request->get('name'))[0];
+
+        if ($extension->getAccessKey() == $request->get('accessKey')){
+            $ssids = unserialize($accessPoint->getSsid());
+          if($ssids !=""){
+              if(sizeof($ssids)==2){
+                  $ssids = array($ssids[1]);
+                  $ssids[] = $request->get('ssid');
+                  $accessPoint->setSsid(serialize($ssids));
+                  $em->flush();
+              }else{
+                  $ssids[] = $request->get('ssid');
+                  $accessPoint->setSsid(serialize($ssids));
+                  $em->flush();
+              }
+          }else{
+              $ssids[] = $request->get('ssid');
+              $accessPoint->setSsid(serialize($ssids));
+              $em->flush();
+          }
+            return new RES("",RES::HTTP_OK);
+
+
+        } else {
+            $message = "Invalid AccessKey!";
+            return new RES($message,RES::HTTP_NOT_FOUND);
+
+        }
+
+    }
 
 //    /**
 //     * Test
@@ -278,12 +443,26 @@ class ApiController extends AbstractFOSRestController
     public function getExtension($macAddress){
        $extensions = $this->getDoctrine()->getRepository(HighwayExtension::class)->findAll();
         foreach ($extensions as $extension){
-            foreach (unserialize($extension->getMacAddress()) as $mac){
-                if($mac == $macAddress){
+            $accessPoints = $this->getDoctrine()->getRepository(AccessPoint::class)->findByExtension($extension);
+            foreach ($accessPoints as $accessPoint){
+                if($accessPoint->getMacAddress() == $macAddress){
                     return $extension;
                 }
             }
         }
         return false;
+    }
+
+    public function sssidGenerator($extensionCodeName){
+
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $ssid = '';
+        for ($i = 0; $i < (25-strlen($extensionCodeName)); $i++) {
+            $ssid .= $characters[rand(0, $charactersLength - 1)];
+        }
+        $prefix = "ORT@#HWS";
+        return $prefix.$extensionCodeName.$ssid;
+
     }
 }

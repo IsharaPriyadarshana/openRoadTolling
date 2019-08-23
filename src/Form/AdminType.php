@@ -16,10 +16,12 @@ class AdminType extends AbstractType
             ->add('className',TextType::class,['label'=>'Class Name','required' => false,  'attr'=>['placeholder'=>"Class Name"]])
             ->add('toll',TextType::class,['label'=>'Toll', 'required' => false, 'attr'=>['placeholder'=>"Toll"]])
             ->add('highwayName',TextType::class,['label'=>'Name','required' => false,  'attr'=>['placeholder'=>"Name"]])
-            ->add('highwayCodeName',TextType::class,['label'=>'Code Name', 'required' => false, 'attr'=>['placeholder'=>" Code Name"]])
+            ->add('highwayCodeName',TextType::class,['label'=>'Code Name', 'required' => false, 'attr'=>['placeholder'=>" Code Name",'maxLength'=>"8"]])
             ->add('highwayExtensionName',TextType::class,['label'=>'Name', 'required' => false, 'attr'=>['placeholder'=>"Name"]])
-            ->add('highwayExtensionCodeName',TextType::class,['label'=>'Code Name', 'required' => false, 'attr'=>['placeholder'=>"Code Name"]])
+            ->add('highwayExtensionCodeName',TextType::class,['label'=>'Code Name', 'required' => false, 'attr'=>['placeholder'=>"Code Name",'maxLength'=>"8"]])
             ->add('sequenceNo',TextType::class,['label'=>'Sequence Number','required' => false,  'attr'=>['placeholder'=>"Sequence Number"]])
+            ->add('apNames',TextType::class,['label'=>'AP Names','required' => false,  'attr'=>['placeholder'=>"AP Names (Separated by Commas)"]])
+            ->add('accessKey',TextType::class,['label'=>'Access Key','required' => false,  'attr'=>['placeholder'=>"Access Key"]])
             ->add('macAddress',TextType::class,['label'=>'MAC Address','required' => false,  'attr'=>['placeholder'=>"MAC Addresses (Separated by Commas)"]])
             ->add('save',SubmitType::class,[
                 'label'=>'Save Changes',

@@ -24,6 +24,16 @@ class HighwayExtension
     private $name;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\AccessPoint", mappedBy="highwayExtension")
+     */
+    private $accessPoint;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $accessKey;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Highway", inversedBy="highwayExtension")
      */
     private $highway;
@@ -38,14 +48,11 @@ class HighwayExtension
     private $egressExtension;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=8)
      */
     private $codeName;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $macAddress;
+
 
     /**
      * @ORM\Column(type="integer")
@@ -56,6 +63,7 @@ class HighwayExtension
     {
         $this->entranceExtension = new ArrayCollection();
         $this->egressExtension = new ArrayCollection();
+        $this->accessPoint = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,14 +181,47 @@ class HighwayExtension
         return $this;
     }
 
-    public function getMacAddress(): ?string
+
+    public function getAccessKey(): ?string
     {
-        return $this->macAddress;
+        return $this->accessKey;
     }
 
-    public function setMacAddress(string $macAddress): self
+    public function setAccessKey(string $accessKey): self
     {
-        $this->macAddress = $macAddress;
+        $this->accessKey = $accessKey;
+
+        return $this;
+    }
+
+
+    /**
+     * @return Collection|AccessPoint[]
+     */
+    public function getAccessPoint(): Collection
+    {
+        return $this->accessPoint;
+    }
+
+    public function addAccessPoint(AccessPoint $accessPoint): self
+    {
+        if (!$this->accessPoint->contains($accessPoint)) {
+            $this->accessPoint[] = $accessPoint;
+            $accessPoint->setHighwayExtension($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAccessPoint(AccessPoint $accessPoint): self
+    {
+        if ($this->accessPoint->contains($accessPoint)) {
+            $this->accessPoint->removeElement($accessPoint);
+            // set the owning side to null (unless already changed)
+            if ($accessPoint->getHighwayExtension() === $this) {
+                $accessPoint->setHighwayExtension(null);
+            }
+        }
 
         return $this;
     }
