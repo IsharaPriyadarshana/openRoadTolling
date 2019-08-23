@@ -89,7 +89,7 @@ class MainController extends AbstractController
 //            dump($request->request);die;
 
             if(isset($request->request->all()['vehicleClasses'])){
-                $registeredVehicleClasses = $request->request->all()['vehicleClasses'];
+                $registeredVehicleClasses = array_unique($request->request->all()['vehicleClasses'],SORT_STRING);
                 $this->removeVehicleClasses($registeredVehicleClasses);
                 $alreadyInVehicleClasses = $this->getVehicleClasses();
                 foreach ($registeredVehicleClasses as $registeredVehicleClass){
@@ -109,7 +109,7 @@ class MainController extends AbstractController
             }
 
             if(isset($request->request->all()['highways'])){
-                $registeredHighways = $request->request->all()['highways'];
+                $registeredHighways = array_unique($request->request->all()['highways'],SORT_STRING);
                 $this->removeHighways($registeredHighways);
                 $alreadyInHighways = $this->getHighways();
                 foreach ($registeredHighways as $registeredHighway){
@@ -130,7 +130,7 @@ class MainController extends AbstractController
             }
 
             if(isset($request->request->all()['highwayExtensions'])){
-                $registeredHighwayExtensions = $request->request->all()['highwayExtensions'];
+                $registeredHighwayExtensions =array_unique( $request->request->all()['highwayExtensions'],SORT_STRING);
                 $this->removeHighwayExtensions($registeredHighwayExtensions);
                 $alreadyInHighwayExtensions = $this->getHighwayExtensions();
                 foreach ($registeredHighwayExtensions as $registeredHighwayExtension){
