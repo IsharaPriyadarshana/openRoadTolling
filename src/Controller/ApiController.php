@@ -442,7 +442,7 @@ class ApiController extends AbstractFOSRestController
     public function getExtension($macAddress){
        $extensions = $this->getDoctrine()->getRepository(HighwayExtension::class)->findAll();
         foreach ($extensions as $extension){
-            $accessPoints = $this->getDoctrine()->getRepository(AccessPoint::class)->findByExtension($extension);
+            $accessPoints = $this->getDoctrine()->getRepository(AccessPoint::class)->findByHighwayExtension($extension);
             foreach ($accessPoints as $accessPoint){
                 if($accessPoint->getMacAddress() == $macAddress){
                     return $extension;
