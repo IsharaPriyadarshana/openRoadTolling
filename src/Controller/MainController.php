@@ -227,6 +227,11 @@ class MainController extends AbstractController
         }
         foreach ($regHighways as $regHighway){
             if(!in_array($regHighway, $newHighways)){
+                $sql = 'DELETE FROM access_point WHERE highway_extension_id IN (SELECT  id FROM highway_extension WHERE highway_id IN (SELECT  id FROM highway WHERE code_name=:codeName));';
+                $stmt = $conn->prepare($sql);
+                $stmt->execute([
+                    'codeName'=> $regHighway]);
+
                 $sql = 'DELETE FROM highway_extension WHERE highway_id = (SELECT  id FROM highway WHERE code_name=:codeName);';
                 $stmt = $conn->prepare($sql);
                 $stmt->execute([
