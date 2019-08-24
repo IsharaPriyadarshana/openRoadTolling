@@ -55,6 +55,7 @@ class RegisterController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
 
             $user->setRevisionNo('0');
+            $user->setPendingTransaction(0);
             $user->setPassword($passwordEncoder->encodePassword($user,$user->getPassword()));
             $user->setRoles(["ROLE_USER"]);
             /**

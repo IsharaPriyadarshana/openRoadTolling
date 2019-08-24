@@ -35,6 +35,11 @@ class User implements UserInterface
     private $roles = [];
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $pendingTransaction;
+
+    /**
      * @var string The hashed password
      * @ORM\Column(type="string")
      * @Assert\NotBlank()
@@ -344,6 +349,18 @@ class User implements UserInterface
                 $transaction->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPendingTransaction(): ?bool
+    {
+        return $this->pendingTransaction;
+    }
+
+    public function setPendingTransaction(bool $pendingTransaction): self
+    {
+        $this->pendingTransaction = $pendingTransaction;
 
         return $this;
     }

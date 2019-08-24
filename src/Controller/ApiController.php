@@ -141,21 +141,24 @@ class ApiController extends AbstractFOSRestController
                     /**
                      * @var HighwayVehicle $isIn
                      */
-                    $isIn=$isIn[0];
-                    if($isIn->getIsCurrentlyIn()==0){
+                    $vehicleIn = false;
+                    foreach ($isIn as $hwv){
+                        if($hwv->getIsCurrentlyIn() == '1'){
+                            $vehicleIn = true;
+                            break;
+                        }
+                    }
+                    if(!$vehicleIn){
                         $highwayVehicle = new HighwayVehicle();
                         $highwayVehicle->setUser($user);
                         $highwayVehicle->setVehicle($vehicle);
                         $highwayVehicle->setEntrance($this->getExtension($macAddress));
-                        $highwayVehicle->getEnterTime($timeStamp);
+                        $highwayVehicle->setEnterTime($timeStamp);
                         $highwayVehicle->setIsCurrentlyIn(1);
                         $em->persist($highwayVehicle);
                         $em->flush();
                         $message = json_encode(["entrance" =>$this->getExtension($macAddress)->getName()]);
                     }else{
-                        /**
-                         * @var HighwayVehicle $highwayVehicle
-                         */
                         $highwayVehicle = $highwayVehicleRepository->findByUser($user)[0];
                         $highwayVehicle->setEgress($this->getExtension($macAddress));
                         $highwayVehicle->setExitTime($timeStamp);
@@ -463,6 +466,43 @@ class ApiController extends AbstractFOSRestController
 
     }
 
+    /**
+     * Test
+     * @FOSRest\Post("/pay_due")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param HighwayVehicleRepository $highwayVehicleRepository
+     * @return RES
+     */
+    public function postPayDue(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, HighwayVehicleRepository $highwayVehicleRepository)
+    {
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+
+                $pendingPayments = $highwayVehicleRepository->findByDrivedBy($user->getId());
+                $pay = true;
+                foreach ($pendingPayments as $pendingPayment){
+                    $pay = $this->deductToll($pendingPayment);
+                    if(!$pay){ break;}
+                }
+
+                return new RES(json_encode(["pay"=>$pay]),RES::HTTP_OK);
+
+            } else {
+                $message = "Invalid Credentials!";
+            }
+
+            return new RES($message,RES::HTTP_FOUND);
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+
+    }
 
 //    /**
 //     * Test
@@ -514,6 +554,7 @@ class ApiController extends AbstractFOSRestController
         }
         $jsonUser["vehicle"] = $vehicles;
         $jsonUser["revisionNo"] = $user->getRevisionNo();
+        $jsonUser["pendingTransaction"] = $user->getPendingTransaction();
         $path = $this->getParameter('uploads_dir').$user->getImage();
         $type = pathinfo($path, PATHINFO_EXTENSION);
         $data = file_get_contents($path);
@@ -594,6 +635,12 @@ class ApiController extends AbstractFOSRestController
             $stmt = $conn->prepare($sql);
             $stmt->execute([
                 'id'=> $highwayVehicle->getId()]);
+
+            return true;
+        }else{
+            $user->setPendingTransaction(true);
+            $em->flush();
+            return false;
         }
 
     }
