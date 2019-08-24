@@ -446,9 +446,9 @@ class ApiController extends AbstractFOSRestController
         if (count($user)){
             $user = $user[0];
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
-                $transactions = $user->getTransaction();
-                var_dump($transactions);die;
-                $message = json_encode($transactions);
+
+
+                $message = $this->jsonEncodeTransaction($user);
                 return new RES($message,RES::HTTP_OK);
 
 
@@ -549,7 +549,7 @@ class ApiController extends AbstractFOSRestController
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $ssid = '';
-        for ($i = 0; $i < (25-strlen($extensionCodeName)); $i++) {
+        for ($i = 0; $i < (24-strlen($extensionCodeName)); $i++) {
             $ssid .= $characters[rand(0, $charactersLength - 1)];
         }
         $prefix = "ORT@#HW";
@@ -596,6 +596,21 @@ class ApiController extends AbstractFOSRestController
                 'id'=> $highwayVehicle->getId()]);
         }
 
+    }
 
+    public function jsonEncodeTransaction(User $user){
+        $transactions = $user->getTransaction();
+        $jsonTransactions = array();
+        foreach ($transactions as $transaction){
+            $jsonTransaction = array();
+            $jsonTransaction["entrance"] = $transaction->getEntrance();
+            $jsonTransaction["egress"] = $transaction->getEgress();
+            $jsonTransaction["vehicleNo"] = $transaction->getVehicleNo();
+            $jsonTransaction["duration"] = $transaction->getDuration();
+            $jsonTransaction["date"] = $transaction->getDate();
+            $jsonTransaction["toll"] = $transaction->getToll();
+            $jsonTransactions[] = $jsonTransaction;
+        }
+        return json_encode($jsonTransactions);
     }
 }
