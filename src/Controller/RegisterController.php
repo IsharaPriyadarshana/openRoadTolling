@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Serial;
 use App\Entity\User;
 use App\Entity\VehicleClass;
 use App\Form\RegisterType;
@@ -273,16 +274,16 @@ class RegisterController extends AbstractController
     /**
      * @Route("/changeImage", name="changeImage")
      * @param Request $request
+     * @return RedirectResponse
      */
 
     public function changeImage(Request $request){
+        if(($request->request->all()["topupPin"]=="")){
+            $em = $this->getDoctrine()->getManager();
+            $conn = $em->getConnection();
 
-        $em = $this->getDoctrine()->getManager();
-        $conn = $em->getConnection();
-
-        $file = $request->files->get('file');
-        $currentImage = $this->get('security.token_storage')->getToken()->getUser()->getImage();
-//        if($currentImage == ""){
+            $file = $request->files->get('file');
+            $currentImage = $this->get('security.token_storage')->getToken()->getUser()->getImage();
 
             if($file){
                 $fileName = md5(uniqid()).'.'.$file->guessExtension();
@@ -299,23 +300,31 @@ class RegisterController extends AbstractController
                     'image' => $fileName,
                     'id' => $this->get('security.token_storage')->getToken()->getUser()->getId()]);
             }
+        }else{
+            $pin =$request->request->all()["topupPin"];
+            $conn = $this->getDoctrine()->getManager()->getConnection();
+            $regSerials = array();
+            $serials = $this->getDoctrine()->getRepository(Serial::class)->findAll();
+            foreach ($serials as $serial){
+                $regSerials[] = $serial->getSerialNo();
+            }
+            foreach ($regSerials as $regSerial){
+                if(explode("####",$regSerial)[0] == $pin){
+                    $em = $this->getDoctrine()->getManager();
+                    $loggedUser = $this->get('security.token_storage')->getToken()->getUser();
+                    $loggedUserAccount = $loggedUser->getAccount();
+                    $currentBalance = $loggedUserAccount->getBalance();
+                    $newBalance = (float)$currentBalance + (float)explode("####",$regSerial)[1];
+                    $loggedUserAccount->setBalance($newBalance);
+                    $em->flush();
+                    $sql = 'DELETE FROM serial WHERE serial_no=:serialNo;';
+                    $stmt = $conn->prepare($sql);
+                    $stmt->execute(['serialNo'=>$regSerial]);
+                }
+            }
+        }
 
-//        }else{
-//            $myFile = $this->getParameter('uploads_dir').$currentImage;
-//            try{
-//                unlink($myFile);
-//
-//            } catch (Exception $e){
-//
-//            }
-//            if($file){
-//                $fileName = $currentImage;
-//                $file->move(
-//                    $this->getParameter('uploads_dir'), $fileName
-//                );
-//
-//            }
-//        }
+
 
 return $this->redirectToRoute('home');
     }
@@ -345,5 +354,6 @@ return $this->redirectToRoute('home');
            }
        }
     }
+
 
 }

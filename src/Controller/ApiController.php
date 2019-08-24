@@ -5,11 +5,16 @@ use App\Entity\AccessPoint;
 use App\Entity\Highway;
 use App\Entity\HighwayExtension;
 use App\Entity\HighwayVehicle;
+use App\Entity\Serial;
+use App\Entity\Transaction;
+use App\Entity\TransactionHistory;
 use App\Entity\User;
 use App\Entity\Vehicle;
 use App\Repository\AccessPointRepository;
 use App\Repository\HighwayExtensionRepository;
 use App\Repository\HighwayVehicleRepository;
+use App\Repository\TransactionHistoryRepository;
+use App\Repository\TransactionRepository;
 use App\Repository\UserRepository;
 use App\Repository\VehicleClassRepository;
 use App\Repository\VehicleRepository;
@@ -157,8 +162,10 @@ class ApiController extends AbstractFOSRestController
                         $highwayVehicle->setDrivedBy($user->getId());
                         $highwayVehicle->setIsCurrentlyIn(0);
                         $highwayVehicle->setUser(null);
+                        $highwayVehicle->setToll($this->calculateToll($highwayVehicle));
                         $em->flush();
                         $message = json_encode(["exit"=>$this->getExtension($macAddress)->getName(),"toll"=>$highwayVehicle->getToll()]);
+                        $this->deductToll($highwayVehicle);
                     }
                 }
 
@@ -372,6 +379,91 @@ class ApiController extends AbstractFOSRestController
 
     }
 
+
+        /**
+     * Test
+     * @FOSRest\Post("/recharge")
+     * @FOSRest\View()
+     */
+    public function postRecharge(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+                $pin = $request->get('pin');
+                $conn = $this->getDoctrine()->getManager()->getConnection();
+                $regSerials = array();
+                $serials = $this->getDoctrine()->getRepository(Serial::class)->findAll();
+                foreach ($serials as $serial){
+                    $regSerials[] = $serial->getSerialNo();
+                }
+                foreach ($regSerials as $regSerial){
+                    if(explode("####",$regSerial)[0] == $pin){
+                        $em = $this->getDoctrine()->getManager();
+                        $loggedUserAccount = $user->getAccount();
+                        $currentBalance = $loggedUserAccount->getBalance();
+                        $newBalance = (float)$currentBalance + (float)explode("####",$regSerial)[1];
+                        $loggedUserAccount->setBalance($newBalance);
+                        $em->flush();
+                        $sql = 'DELETE FROM serial WHERE serial_no=:serialNo;';
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute(['serialNo'=>$regSerial]);
+                        return new RES(json_encode(['balance'=>$newBalance]),RES::HTTP_OK);
+                    }
+                }
+
+                return new RES("invalid key!",RES::HTTP_NOT_ACCEPTABLE);
+
+
+            } else {
+                $message = "Invalid Credentials!";
+            }
+
+            return new RES($message,RES::HTTP_FOUND);
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+
+    }
+
+
+    /**
+     * Test
+     * @FOSRest\Post("/get_transactions")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param TransactionHistoryRepository $transactionHistoryRepository
+     * @return RES
+     */
+    public function postGetTransactions(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, TransactionHistoryRepository $transactionHistoryRepository)
+    {
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
+                $transactions = $user->getTransaction();
+                var_dump($transactions);die;
+                $message = json_encode($transactions);
+                return new RES($message,RES::HTTP_OK);
+
+
+            } else {
+                $message = "Invalid Credentials!";
+            }
+
+            return new RES($message,RES::HTTP_FOUND);
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+
+    }
+
+
 //    /**
 //     * Test
 //     * @FOSRest\Post("/register_vehicle")
@@ -462,6 +554,48 @@ class ApiController extends AbstractFOSRestController
         }
         $prefix = "ORT@#HW";
         return $prefix.$extensionCodeName.$ssid;
+
+    }
+
+    public function calculateToll(HighwayVehicle $highwayVehicle){
+        $entrance = $highwayVehicle->getEntrance()->getSequenceNo();
+        $exit = $highwayVehicle->getEgress()->getSequenceNo();
+        $distance = abs($entrance-$exit);
+        $unitToll = $highwayVehicle->getVehicle()->getClass()->getToll();
+        return (float)$distance * (float)$unitToll;
+    }
+
+    public function deductToll(HighwayVehicle $highwayVehicle){
+       $em = $this->getDoctrine()->getManager();
+       $conn = $this->getDoctrine()->getManager()->getConnection();
+        /**
+         * @var User $user
+         */
+        $user = $highwayVehicle->getDrivedBy();
+        $user = $this->getDoctrine()->getRepository(User::class)->find($user);
+
+        if((float)$user->getAccount()->getBalance() > (float)$highwayVehicle->getToll()){
+            $balance = (float)$user->getAccount()->getBalance() - (float)$highwayVehicle->getToll();
+            $user->getAccount()->setBalance((float)($balance));
+            $transaction = new TransactionHistory();
+            $transaction->setUser($user);
+            $transaction->setEntrance($highwayVehicle->getEntrance()->getName());
+            $transaction->setEgress($highwayVehicle->getEgress()->getName());
+            $duration = abs((int)$highwayVehicle->getEnterTime() - (int)$highwayVehicle->getExitTime())/3600000.0;
+            $transaction->setDuration($duration);
+            $transaction->setVehicleNo($highwayVehicle->getVehicle()->getVehicleNo());
+            $transaction->setToll($highwayVehicle->getToll());
+            date_default_timezone_set('Asia/Colombo');
+            $transaction->setDate(date('m/d/Y h:i:s a'));
+            $em->persist($transaction);
+            $em->flush();
+
+            $sql = 'DELETE FROM highway_vehicle WHERE id=:id;';
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                'id'=> $highwayVehicle->getId()]);
+        }
+
 
     }
 }

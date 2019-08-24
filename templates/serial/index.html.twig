@@ -1,0 +1,137 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Top Up
+{% endblock %}
+{% block tabLogin %}active{% endblock %}
+{% block refHome %}{{ path('main') }}{% endblock %}
+   {% block stylesheets %}
+       <style>
+
+           img {
+               width: 50%;
+               height: auto;
+               max-width: 50%;
+               display: block;
+               margin-left: auto;
+               margin-right: auto;
+
+           }
+
+       </style>
+
+
+   {% endblock %}
+
+{% block body %}
+
+
+
+
+
+
+    <div class="container" style=" margin-left: auto;margin-right: auto;margin-top: 1cm;" >
+        <div class="row justify-content-start">
+            <div class="col-lg-4"></div>
+            <div class="col-lg-4">
+                <div class="card" style="width: 18rem;text-align: center;">
+                    {% if(serial=="") %}
+                    <div style="margin-top: 0.5cm;"></div>
+                    <img src="/images/topup.png" class="card-img-top" alt="login">
+                    <div class="card-body">
+                        <h5 class="card-title">Top Up</h5>
+                    {% else %}
+                        <div style="margin-top: 0.5cm;"></div>
+                        <img src="/images/barcode.jpg" class="card-img-top" alt="login">
+                        <div class="card-body">
+                            <h5 class="card-title">Your Top Up Key</h5>
+                    {% endif %}
+
+                        <p class="card-text">
+                         {% if(serial == "")  %}
+                            {{ form_start(form) }}
+                        <div style="margin-top: 0.5cm;"></div>
+                        {{ form_errors(form.name) }}
+                        {{ form_widget(form.name) }}
+                        <div style="margin-top: 0.5cm;"></div>
+                        <input type="text" id="serial_cardNumber"  name="top_up[cardNumber]" onkeypress="isCard(event)" required="required" placeholder="Debit/Credit Card Number" class="form-control"  />
+                        <div style="margin-top: 0.5cm;"></div>
+                        <input type="text" id="serial_expiryDate"  name="top_up[expiryDate]" onkeypress="isDate(event)" required="required" placeholder="Expiry Date (MM/YY)" class="form-control"  />
+                        <div style="margin-top: 0.5cm;"></div>
+                        <input type="text" id="serial_ccv"  name="top_up[ccv]" onkeypress="isCcv(event)" required="required" placeholder="CCV Code" class="form-control"  />
+                        <div style="margin-top: 0.5cm;"></div>
+                        <input type="text" id="serial_amount"  name="top_up[amount]" onkeypress="isAmount(event)" required="required" placeholder="Amount (In Rupees)" class="form-control"  />
+                        <div style="margin-top: 0.5cm;"></div>
+                        {{ form_widget(form.save) }}
+                        {{ form_row(form._token) }}
+                        {{ form_errors(form) }}
+                        </form>
+                        {% else %}
+                            <div style="margin-top: 0.5cm;"></div>
+                            <input type="text" id="serial_amount"  name="top_up[amount]"  value="{{ serial }}" readonly="readonly" class="form-control"  />
+                            <div style="margin-top: 0.5cm;"></div>
+                            *Plese use this key to top up your account in Account -> Top Up
+                            <div style="margin-top: 0.5cm;"></div>
+                            <a href="{{ path('main') }}" class="btn btn-success btn-lg">Home</a>
+                        {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4"></div>
+        </div>
+
+    </div>
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    function isCard(eve) {
+        var ch = String.fromCharCode(eve.which);
+
+        if (!(/[0-9]/.test(ch))){
+            eve.preventDefault();
+        }
+        if (document.getElementById('serial_cardNumber').value.length > 15){
+            eve.preventDefault();
+        }
+    }
+    function isCcv(eve) {
+        var ch = String.fromCharCode(eve.which);
+
+        if (!(/[0-9]/.test(ch))){
+            eve.preventDefault();
+        }
+        if (document.getElementById('serial_ccv').value.length > 2){
+            eve.preventDefault();
+        }
+    }
+    function isAmount(eve) {
+        var ch = String.fromCharCode(eve.which);
+
+        if (!(/[0-9]/.test(ch))){
+            eve.preventDefault();
+        }
+        if (document.getElementById('serial_amount').value.length > 5){
+            eve.preventDefault();
+        }
+    }
+    function isDate(eve) {
+        var ch = String.fromCharCode(eve.which);
+
+        if (!(/[0-9]/.test(ch))){
+            eve.preventDefault();
+        }
+        if (document.getElementById('serial_expiryDate').value.length ==2){
+            document.getElementById('serial_expiryDate').value = document.getElementById('serial_expiryDate').value +"/";
+        }
+        if (document.getElementById('serial_expiryDate').value.length > 4){
+            eve.preventDefault();
+        }
+    }
+</script>
+{% endblock %}
+
+

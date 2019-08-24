@@ -55,6 +55,11 @@ class User implements UserInterface
     private $lastName;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\TransactionHistory", mappedBy="user")
+     */
+    private $transaction;
+
+    /**
      * @ORM\Column(type="string",length=255,nullable=true)
      *
      */
@@ -102,6 +107,7 @@ class User implements UserInterface
     public function __construct()
     {
         $this->vehicle = new ArrayCollection();
+        $this->transaction = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -310,4 +316,37 @@ class User implements UserInterface
 
         return $this;
     }
+
+    /**
+     * @return Collection|TransactionHistory[]
+     */
+    public function getTransaction(): Collection
+    {
+        return $this->transaction;
+    }
+
+    public function addTransaction(TransactionHistory $transaction): self
+    {
+        if (!$this->transaction->contains($transaction)) {
+            $this->transaction[] = $transaction;
+            $transaction->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTransaction(TransactionHistory $transaction): self
+    {
+        if ($this->transaction->contains($transaction)) {
+            $this->transaction->removeElement($transaction);
+            // set the owning side to null (unless already changed)
+            if ($transaction->getUser() === $this) {
+                $transaction->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+
 }
