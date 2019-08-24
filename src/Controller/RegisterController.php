@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Serial;
 use App\Entity\User;
+use App\Entity\Vehicle;
 use App\Entity\VehicleClass;
 use App\Form\RegisterType;
 use App\Form\UpdateType;
@@ -204,12 +205,14 @@ class RegisterController extends AbstractController
                     foreach ($registeredVehicles as $registeredVehicle){
                         $vehicle = explode("        |        ",$registeredVehicle);
                         if(!in_array($vehicle[0],$alreadyInVehicles)){
-                            $sql = '
+                            if(!($this->isVehicleRegistered($vehicle[0]))){
+                                $sql = '
                         INSERT INTO vehicle (vehicle_no, class_id)
                         VALUES(:vehicleNo, :classId);';
-                            $stmt = $conn->prepare($sql);
-                            $stmt->execute(['vehicleNo' => $vehicle[0],
-                                'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId()]);
+                                $stmt = $conn->prepare($sql);
+                                $stmt->execute(['vehicleNo' => $vehicle[0],
+                                    'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId()]);
+                            }
                             $sql = 'INSERT INTO vehicle_user(vehicle_id,user_id)VALUES(:vehicleId,:userId)';
                             $stmt = $conn->prepare($sql);
                             $stmt->execute(['vehicleId' => $vehicleRepository->findByVehicleNo($vehicle[0])[0]->getId(),
@@ -354,5 +357,17 @@ return $this->redirectToRoute('home');
        }
     }
 
+    public function isVehicleRegistered($vehicleNo){
+        $vehicles = $this->getDoctrine()->getRepository(Vehicle::class)->findAll();
+        foreach ($vehicles as $vehicle){
+            /**
+             * @var  Vehicle $vehicle
+             */
+            if ($vehicle->getVehicleNo()==$vehicleNo){
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
