@@ -206,8 +206,7 @@ class RegisterController extends AbstractController
                         if(!in_array($vehicle[0],$alreadyInVehicles)){
                             $sql = '
                         INSERT INTO vehicle (vehicle_no, class_id)
-                        VALUES(:vehicleNo, :classId)
-                        WHERE NOT EXISTS (SELECT id FROM vehicle WHERE vehicle_no = :vehicleNo);';
+                        VALUES(:vehicleNo, :classId);';
                             $stmt = $conn->prepare($sql);
                             $stmt->execute(['vehicleNo' => $vehicle[0],
                                 'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId()]);
