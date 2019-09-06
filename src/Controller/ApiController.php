@@ -260,7 +260,7 @@ class ApiController extends AbstractFOSRestController
 
 
 
-                return new RES("",RES::HTTP_OK);
+                return new RES("Vehicle Added!",RES::HTTP_OK);
 
             } else {
                 $message = "Invalid Credentials!";
@@ -371,7 +371,7 @@ class ApiController extends AbstractFOSRestController
               $accessPoint->setSsid(serialize($ssids));
               $em->flush();
           }
-            return new RES("",RES::HTTP_OK);
+            return new RES("SSID Changed!",RES::HTTP_OK);
 
 
         } else {
