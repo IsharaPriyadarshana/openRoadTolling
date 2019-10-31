@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Entity\VehicleClass;
 use App\Form\AdminType;
 use App\Form\RegisterType;
+use App\Repository\AccessPointRepository;
 use App\Repository\HighwayExtensionRepository;
 use App\Repository\HighwayRepository;
 use App\Repository\VehicleClassRepository;
@@ -37,6 +38,36 @@ class MainController extends AbstractController
 //
 //            return $this->redirect($this->generateUrl('home'));
 //        }
+
+
+    }
+
+
+    /**
+     * @Route("/viewData/{id}", name="viewData")
+     * @param Request $request
+     * @param VehicleClassRepository $vehicleClassRepository
+     * @param HighwayRepository $highwayRepository
+     * @param HighwayExtensionRepository $highwayExtensionRepository
+     * @param AccessPointRepository $accessPointRepository
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function viewData(Request $request,VehicleClassRepository $vehicleClassRepository, HighwayRepository $highwayRepository,HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository)
+    {
+
+        $vehicleClasses = $vehicleClassRepository->findAll();
+        $highways = $highwayRepository->findAll();
+        $highwayExtensions = $highwayExtensionRepository->findAll();
+        $accessPoints = $accessPointRepository->findAll();
+
+        return $this->render('main/viewData.html.twig', [
+            'controller_name' => 'MainController',
+            'vehicleClasses' => $vehicleClasses,
+            'highways' => $highways,
+            'highwayExtensions' => $highwayExtensions,
+            'accessPoints' => $accessPoints,
+            'id' => $request->get('id')
+        ]);
 
 
     }

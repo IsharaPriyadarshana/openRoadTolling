@@ -1,0 +1,133 @@
+{% extends('base.html.twig') %}
+{% block title %}Welcome- Administrator!{% endblock %}
+              {% block dropDown %}
+                  Data
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="{{ path('admin')  }}"> Edit Data</a>
+                      {% if id=='vehicleClasses' %}
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
+                      {% elseif id=='highways' %}
+                      <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
+                      <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
+                      {% elseif id=='highwayInterchanges' %}
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
+                      {% elseif id=='accessPoints' %}
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
+                      {% endif %}
+                  </div>
+              {% endblock %}
+{% block body %}
+    <div style="margin-top: 0.5cm;"></div>
+        <div class="row">
+        <div class="col-lg-1"></div>
+        <div class="col-lg-10">
+            {% if id=='vehicleClasses' %}
+                <h3>Vehicle Classes</h3>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Class Name</th>
+                            <th>Toll</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if( vehicleClasses|length >0) %}
+                            {% for vehicleClass in vehicleClasses %}
+                                <tr>
+                                    <td>{{ vehicleClass.id }}</td>
+                                    <td>{{ vehicleClass.className }}</td>
+                                    <td>{{ vehicleClass.toll }}</td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                     </tbody>
+                </table>
+            {% elseif id=='highways' %}
+                <h3>Highways</h3>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Highway Name</th>
+                        <th>Highway Code Name</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if( highways|length >0) %}
+                        {% for highway in highways %}
+                            <tr>
+                                <td>{{ highway.id }}</td>
+                                <td>{{ highway.name }}</td>
+                                <td>{{ highway.codeName }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            {% elseif id=='highwayInterchanges' %}
+                <h3>Highway Interchanges</h3>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Highway</th>
+                        <th>Interchange Name</th>
+                        <th>Interchange Code Name</th>
+                        <th>Sequence No</th>
+                        <th>Access Key</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if( highwayExtensions|length >0) %}
+                        {% for highwayExtension in highwayExtensions %}
+                            <tr>
+                                <td>{{ highwayExtension.highway.name }}</td>
+                                <td>{{ highwayExtension.name }}</td>
+                                <td>{{ highwayExtension.codeName }}</td>
+                                <td>{{ highwayExtension.sequenceNo }}</td>
+                                <td>{{ highwayExtension.accessKey }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            {% elseif id=='accessPoints' %}
+                <h3>Access Points</h3>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Highway Interchange Name</th>
+                        <th> Access Point Name</th>
+                        <th> Mac Address</th>
+                        <th> SSID</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if( accessPoints|length >0) %}
+                        {% for accessPoint in accessPoints %}
+                            <tr>
+                                <td>{{ accessPoint.id }}</td>
+                                <td>{{ accessPoint.highwayExtension.name }}</td>
+                                <td>{{ accessPoint.name }}</td>
+                                <td>{{ accessPoint.macAddress }}</td>
+                                <td>{{ accessPoint.ssid }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+
+
+{% endblock %}

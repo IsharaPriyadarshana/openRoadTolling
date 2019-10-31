@@ -250,10 +250,12 @@ class ApiController extends AbstractFOSRestController
                     $vehicle->setVehicleNo($vehicleNo);
                     $vehicle->addUser($user);
                     $em->persist($vehicle);
+                    $user->setRevisionNo($user->getRevisionNo() +1);
                     $em->flush();
                 }else{
                     $vehicle= $vehicle[0];
                     $vehicle->addUser($user);
+                    $user->setRevisionNo($user->getRevisionNo() +1);
                     $em->flush();
                 }
 
@@ -577,7 +579,7 @@ class ApiController extends AbstractFOSRestController
         foreach ($extensions as $extension){
             $accessPoints = $this->getDoctrine()->getRepository(AccessPoint::class)->findByHighwayExtension($extension);
             foreach ($accessPoints as $accessPoint){
-                if($accessPoint->getMacAddress() == $macAddress){
+                if( strtolower($accessPoint->getMacAddress()) == strtolower($macAddress) ){
                     return $extension;
                 }
             }

@@ -1,10 +1,20 @@
 {% extends('base.html.twig') %}
 {% block title %}Welcome- Administrator!{% endblock %}
+              {% block dropDown %}
+                   Data
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                      <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
+                      <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
+                      <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
+                  </div>
+              {% endblock %}
 {% block body %}
 
     {{ form_start(form) }}
 
     <div class="container">
+
         <div class="row">
             <div class="col-lg-4">
                 <div style="margin-top: 0.5cm;"></div>
