@@ -12,6 +12,7 @@ use App\Form\RegisterType;
 use App\Repository\AccessPointRepository;
 use App\Repository\HighwayExtensionRepository;
 use App\Repository\HighwayRepository;
+use App\Repository\HighwayVehicleRepository;
 use App\Repository\VehicleClassRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -50,21 +51,24 @@ class MainController extends AbstractController
      * @param HighwayRepository $highwayRepository
      * @param HighwayExtensionRepository $highwayExtensionRepository
      * @param AccessPointRepository $accessPointRepository
+     * @param HighwayVehicleRepository $highwayVehicleRepository
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function viewData(Request $request,VehicleClassRepository $vehicleClassRepository, HighwayRepository $highwayRepository,HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository)
+    public function viewData(Request $request,VehicleClassRepository $vehicleClassRepository, HighwayRepository $highwayRepository,HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository, HighwayVehicleRepository $highwayVehicleRepository)
     {
 
         $vehicleClasses = $vehicleClassRepository->findAll();
         $highways = $highwayRepository->findAll();
         $highwayExtensions = $highwayExtensionRepository->findAll();
         $accessPoints = $accessPointRepository->findAll();
+        $highwayVehicles = $highwayVehicleRepository->findBy(['isCurrentlyIn' => '1']);
 
         return $this->render('main/viewData.html.twig', [
             'controller_name' => 'MainController',
             'vehicleClasses' => $vehicleClasses,
             'highways' => $highways,
             'highwayExtensions' => $highwayExtensions,
+            'highwayVehicles' => $highwayVehicles,
             'accessPoints' => $accessPoints,
             'id' => $request->get('id')
         ]);
