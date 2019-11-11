@@ -167,7 +167,7 @@ class ApiController extends AbstractFOSRestController
                         $highwayVehicle->setUser(null);
                         $highwayVehicle->setToll($this->calculateToll($highwayVehicle));
                         $em->flush();
-                        $message = json_encode(["exit"=>$this->getExtension($macAddress)->getName(),"toll"=>$highwayVehicle->getToll()]);
+                        $message = json_encode(["exit"=>$this->getExtension($macAddress)->getName(),"toll"=>sprintf("%.3f", $highwayVehicle->getToll()) ]);
                         $this->deductToll($highwayVehicle);
                     }
                 }
