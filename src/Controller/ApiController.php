@@ -262,7 +262,7 @@ class ApiController extends AbstractFOSRestController
 
 
 
-                return new RES("Vehicle Added!",RES::HTTP_OK);
+                return new RES(json_encode(["message"=>"Vehicle Added!"]),RES::HTTP_OK);
 
             } else {
                 $message = "Invalid Credentials!";
