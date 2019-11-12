@@ -184,6 +184,7 @@
                         <th> Exit Time</th>
                         <th> Toll</th>
                         <th> Driver</th>
+                        <th> Current Balance</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -197,13 +198,15 @@
                                 <td>{{ pendingVehicle.egress.name }}</td>
                                 <td>{{ pendingVehicle.exitTime|date }}</td>
                                 <td>{{ pendingVehicle.toll }}</td>
-                                <td>
+
                                     {% for user in users %}
                                         {% if user.id ==pendingVehicle.drivedBy  %}
-                                            {{ user.firstName~" "~user.lastName }}
+                                            <td>{{ user.firstName~" "~user.lastName }}</td>
+                                            <td>{{ user.account.balance }}</td>
+
                                         {% endif %}
                                     {% endfor %}
-                                </td>
+
                             </tr>
                         {% endfor %}
                     {% endif %}
