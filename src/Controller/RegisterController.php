@@ -39,12 +39,18 @@ class RegisterController extends AbstractController
     {
         $em = $this->getDoctrine()->getManager();
         $conn =$em->getConnection();
+        $regiVehicles = $vehicleRepository->findAll();
         $user = new User();
         $form = $this->createForm(RegisterType::class,$user,[
             'allow_extra_fields' => true
         ]);
 
         $vehicleClasses = $vehicleClassRepository->findAll();
+
+        $regVehicles = array();
+        foreach ($regiVehicles as $regivehicle){
+            $regVehicles[] = $regivehicle->getVehicleNo();
+        }
 
 
         $form->handleRequest($request);
@@ -79,14 +85,14 @@ class RegisterController extends AbstractController
                 $registeredVehicles = $request->request->all()['vehicles'];
                 foreach ($registeredVehicles as $registeredVehicle){
                     $vehicle = explode("        |        ",$registeredVehicle);
-
-                    $sql = '
+                    if(!in_array($vehicle[0],$regVehicles)){
+                        $sql = '
                         INSERT INTO vehicle (vehicle_no, class_id)
-                        SELECT :vehicleNo, :classId
-                        WHERE NOT EXISTS (SELECT id FROM vehicle WHERE vehicle_no = :vehicleNo);';
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute(['vehicleNo' => $vehicle[0],
-                        'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId()]);
+                        VALUES(:vehicleNo, :classId);';
+                        $stmt = $conn->prepare($sql);
+                        $stmt->execute(['vehicleNo' => $vehicle[0],
+                            'classId' => $vehicleClassRepository->findByClassName($vehicle[1])[0]->getId()]);
+                    }
                     $sql = 'INSERT INTO vehicle_user(vehicle_id,user_id)VALUES(:vehicleId,:userId)';
                     $stmt = $conn->prepare($sql);
                     $stmt->execute(['vehicleId' => $vehicleRepository->findByVehicleNo($vehicle[0])[0]->getId(),
