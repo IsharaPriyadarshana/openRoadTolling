@@ -279,6 +279,11 @@ class ApiController extends AbstractFOSRestController
      * Test
      * @FOSRest\Post("/get_vehicle_classes")
      * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @param VehicleClassRepository $vehicleClassRepository
+     * @return RES
      */
     public function postGetVehicleClasses(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, VehicleClassRepository $vehicleClassRepository)
     {

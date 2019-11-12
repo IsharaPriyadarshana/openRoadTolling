@@ -10,26 +10,37 @@
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
                       {% elseif id=='highways' %}
                       <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                       <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
                       {% elseif id=='highwayInterchanges' %}
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
                       {% elseif id=='accessPoints' %}
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
                       {% elseif id=='highwayVehicles' %}
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
+                      {% elseif id=='pendingVehicles' %}
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
                       {% endif %}
                   </div>
               {% endblock %}
@@ -160,6 +171,44 @@
                 {% endif %}
                 </tbody>
             </table>
+            {% elseif id=='pendingVehicles' %}
+                <h3>Pending Transactions</h3>
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Vehicle No</th>
+                        <th> Vehicle Type</th>
+                        <th>Entrance</th>
+                        <th> Enter Time</th>
+                        <th> Exit</th>
+                        <th> Exit Time</th>
+                        <th> Toll</th>
+                        <th> Driver</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if( pendingVehicles|length >0) %}
+                        {% for pendingVehicle in pendingVehicles %}
+                            <tr>
+                                <td>{{ pendingVehicle.vehicle.vehicleNo }}</td>
+                                <td>{{ pendingVehicle.vehicle.class.className }}</td>
+                                <td>{{ pendingVehicle.entrance.name }}</td>
+                                <td>{{ pendingVehicle.enterTime|date }}</td>
+                                <td>{{ pendingVehicle.egress.name }}</td>
+                                <td>{{ pendingVehicle.exitTime|date }}</td>
+                                <td>{{ pendingVehicle.toll }}</td>
+                                <td>
+                                    {% for user in users %}
+                                        {% if user.id ==pendingVehicle.drivedBy  %}
+                                            {{ user.firstName~" "~user.lastName }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                    </tbody>
+                </table>
             {% endif %}
         </div>
     </div>

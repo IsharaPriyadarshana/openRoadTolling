@@ -13,6 +13,7 @@ use App\Repository\AccessPointRepository;
 use App\Repository\HighwayExtensionRepository;
 use App\Repository\HighwayRepository;
 use App\Repository\HighwayVehicleRepository;
+use App\Repository\UserRepository;
 use App\Repository\VehicleClassRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -47,6 +48,7 @@ class MainController extends AbstractController
     /**
      * @Route("/viewData/{id}", name="viewData")
      * @param Request $request
+     * @param UserRepository $userRepository
      * @param VehicleClassRepository $vehicleClassRepository
      * @param HighwayRepository $highwayRepository
      * @param HighwayExtensionRepository $highwayExtensionRepository
@@ -54,7 +56,7 @@ class MainController extends AbstractController
      * @param HighwayVehicleRepository $highwayVehicleRepository
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function viewData(Request $request,VehicleClassRepository $vehicleClassRepository, HighwayRepository $highwayRepository,HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository, HighwayVehicleRepository $highwayVehicleRepository)
+    public function viewData(Request $request,UserRepository $userRepository,VehicleClassRepository $vehicleClassRepository, HighwayRepository $highwayRepository,HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository, HighwayVehicleRepository $highwayVehicleRepository)
     {
 
         $vehicleClasses = $vehicleClassRepository->findAll();
@@ -62,14 +64,17 @@ class MainController extends AbstractController
         $highwayExtensions = $highwayExtensionRepository->findAll();
         $accessPoints = $accessPointRepository->findAll();
         $highwayVehicles = $highwayVehicleRepository->findBy(['isCurrentlyIn' => '1']);
-
+        $pendingVehicles = $highwayVehicleRepository->findBy(['isCurrentlyIn' =>'0']);
+        $users = $userRepository->findAll();
         return $this->render('main/viewData.html.twig', [
             'controller_name' => 'MainController',
             'vehicleClasses' => $vehicleClasses,
             'highways' => $highways,
             'highwayExtensions' => $highwayExtensions,
             'highwayVehicles' => $highwayVehicles,
+            'pendingVehicles' => $pendingVehicles,
             'accessPoints' => $accessPoints,
+            'users'=>$users,
             'id' => $request->get('id')
         ]);
 
