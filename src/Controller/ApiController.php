@@ -26,6 +26,7 @@ use App\Entity\Article;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as RES;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use \Datetime;
 
 /**
  * Brand controller.
@@ -622,7 +623,7 @@ class ApiController extends AbstractFOSRestController
         $user = $highwayVehicle->getDrivedBy();
         $user = $this->getDoctrine()->getRepository(User::class)->find($user);
 
-        if((float)$user->getAccount()->getBalance() > (float)$highwayVehicle->getToll()){
+        if((float)$user->getAccount()->getBalance() >= (float)$highwayVehicle->getToll()){
             $balance = (float)$user->getAccount()->getBalance() - (float)$highwayVehicle->getToll();
             $user->getAccount()->setBalance((float)($balance));
             $transaction = new TransactionHistory();
