@@ -629,8 +629,11 @@ class ApiController extends AbstractFOSRestController
             $transaction->setUser($user);
             $transaction->setEntrance($highwayVehicle->getEntrance()->getName());
             $transaction->setEgress($highwayVehicle->getEgress()->getName());
-            $duration = abs((int)$highwayVehicle->getEnterTime() - (int)$highwayVehicle->getExitTime())/3600000.0;
-            $transaction->setDuration($duration);
+            $datetime1 = new DateTime(str_replace('/','-',$highwayVehicle->getEnterTime()));
+            $datetime2 = new DateTime(str_replace('/','-',$highwayVehicle->getExitTime()));
+            $interval = date_diff($datetime2, $datetime1);
+            $hrs = $interval->format('%h') + ($interval->days * 24) + ($interval->format('%i') / 60);
+            $transaction->setDuration(round($hrs,2)." hours");
             $transaction->setVehicleNo($highwayVehicle->getVehicle()->getVehicleNo());
             $transaction->setToll($highwayVehicle->getToll());
             date_default_timezone_set('Asia/Colombo');
