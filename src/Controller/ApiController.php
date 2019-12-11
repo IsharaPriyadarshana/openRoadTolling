@@ -320,15 +320,20 @@ class ApiController extends AbstractFOSRestController
      * @param HighwayExtensionRepository $highwayExtensionRepository
      * @return RES
      */
-    public function postUpdateSSID(Request $request,  HighwayExtensionRepository $highwayExtensionRepository)
+    public function postUpdateSSID(Request $request,  HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository)
     {
         /**
          * @var HighwayExtension $extension
          */
         $extension = $highwayExtensionRepository->findByCodeName($request->get('codeName'))[0];
+        /**
+         * @var AccessPoint $accessPoint
+         */
+        $accessPoint = $accessPointRepository->findByName($request->get('name'))[0];
+
 
         if ($extension->getAccessKey() == $request->get('accessKey')){
-            $message = json_encode(["ssid"=>$this->sssidGenerator($extension->getCodeName())]);
+            $message = json_encode(["ssid"=>$this->sssidGenerator($extension->getCodeName(), $accessPoint->getName())]);
             return new RES($message,RES::HTTP_OK);
 
 
@@ -342,7 +347,7 @@ class ApiController extends AbstractFOSRestController
 
 
     /**
-     * Test
+     * Testp
      * @FOSRest\Post("/update_ssid_ack")
      * @FOSRest\View()
      * @param Request $request
@@ -593,16 +598,16 @@ class ApiController extends AbstractFOSRestController
         return false;
     }
 
-    public function sssidGenerator($extensionCodeName){
+    public function sssidGenerator($extensionCodeName, $accessPointName){
 
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
         $ssid = '';
-        for ($i = 0; $i < (24-strlen($extensionCodeName)); $i++) {
+        for ($i = 0; $i < (24-strlen($extensionCodeName)-strlen($accessPointName)-1); $i++) {
             $ssid .= $characters[rand(0, $charactersLength - 1)];
         }
         $prefix = "ORT@#HW";
-        return $prefix.$extensionCodeName.$ssid;
+        return $prefix.$extensionCodeName.$ssid.'_'.$accessPointName;
 
     }
 

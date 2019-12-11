@@ -191,6 +191,7 @@ class MainController extends AbstractController
                            for($i=0;$i<sizeof($macAddresses);$i++){
                                $ap = new AccessPoint();
                                $ap->setName($apNames[$i]);
+                               $ap->setSsid($this->sssidGenerator($highwayExtension[1],$apNames[$i]));
                                $ap->setMacAddress($macAddresses[$i]);
                                $ap->setHighwayExtension($exchange);
                                $em->persist($ap);
@@ -324,6 +325,18 @@ class MainController extends AbstractController
         }
     }
 
+    public function sssidGenerator($extensionCodeName, $accessPointName){
+
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $charactersLength = strlen($characters);
+        $ssid = '';
+        for ($i = 0; $i < (24-strlen($extensionCodeName)-strlen($accessPointName)-1); $i++) {
+            $ssid .= $characters[rand(0, $charactersLength - 1)];
+        }
+        $prefix = "ORT@#HW";
+        return $prefix.$extensionCodeName.$ssid.'_'.$accessPointName;
+
+    }
 
 
 }
