@@ -6,6 +6,7 @@
         "ext-ctype": "*",
         "ext-iconv": "*",
         "friendsofsymfony/rest-bundle": "^2.5",
+        "glooby/task-bundle": "~3.0",
         "jms/serializer-bundle": "^3.4",
         "sensio/framework-extra-bundle": "^5.4",
         "symfony/apache-pack": "^1.0",

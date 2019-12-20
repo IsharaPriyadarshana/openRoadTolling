@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d1232e0f1d6b89b9f45b2d687bc3cb8b",
+    "content-hash": "13e3d5c92683480d7793a49910ae81f6",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -1208,6 +1208,60 @@
             "time": "2018-06-14T14:45:07+00:00"
         },
         {
+            "name": "dragonmantank/cron-expression",
+            "version": "v2.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dragonmantank/cron-expression.git",
+                "reference": "72b6fbf76adb3cf5bc0db68559b33d41219aba27"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dragonmantank/cron-expression/zipball/72b6fbf76adb3cf5bc0db68559b33d41219aba27",
+                "reference": "72b6fbf76adb3cf5bc0db68559b33d41219aba27",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^6.4|^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Cron\\": "src/Cron/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                },
+                {
+                    "name": "Chris Tankersley",
+                    "email": "chris@ctankersley.com",
+                    "homepage": "https://github.com/dragonmantank"
+                }
+            ],
+            "description": "CRON for PHP: Calculate the next or previous run date and determine if a CRON expression is due",
+            "keywords": [
+                "cron",
+                "schedule"
+            ],
+            "time": "2019-03-31T00:38:28+00:00"
+        },
+        {
             "name": "egulias/email-validator",
             "version": "2.1.10",
             "source": {
@@ -1421,6 +1475,61 @@
                 "rest"
             ],
             "time": "2019-01-03T13:05:12+00:00"
+        },
+        {
+            "name": "glooby/task-bundle",
+            "version": "3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/glooby/task-bundle.git",
+                "reference": "bf65b114956a403aa2181507632eefc5b591ebfb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/glooby/task-bundle/zipball/bf65b114956a403aa2181507632eefc5b591ebfb",
+                "reference": "bf65b114956a403aa2181507632eefc5b591ebfb",
+                "shasum": ""
+            },
+            "require": {
+                "doctrine/orm": "~2.6",
+                "dragonmantank/cron-expression": "~2.0",
+                "php": ">=7.1",
+                "symfony/framework-bundle": "~4.3"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "~2.1",
+                "phpspec/prophecy": "~1.8",
+                "phpunit/phpunit": "^7",
+                "symfony/phpunit-bridge": "^4.3"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Glooby\\TaskBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Emil Kilhage",
+                    "email": "emil.kilhage@glooby.com",
+                    "homepage": "https://www.glooby.se"
+                }
+            ],
+            "description": "Scheduling of tasks for symfony made simple",
+            "homepage": "https://www.glooby.se",
+            "keywords": [
+                "bundle",
+                "cron",
+                "glooby",
+                "scheduler",
+                "symfony",
+                "task"
+            ],
+            "time": "2019-10-18T08:16:07+00:00"
         },
         {
             "name": "hoa/compiler",

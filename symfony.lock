@@ -78,6 +78,9 @@
     "doctrine/reflection": {
         "version": "v1.0.0"
     },
+    "dragonmantank/cron-expression": {
+        "version": "v2.3.0"
+    },
     "easycorp/easy-log-handler": {
         "version": "1.0",
         "recipe": {
@@ -107,6 +110,9 @@
         "files": [
             "config/packages/fos_rest.yaml"
         ]
+    },
+    "glooby/task-bundle": {
+        "version": "3.0.0"
     },
     "hoa/compiler": {
         "version": "3.17.08.08"

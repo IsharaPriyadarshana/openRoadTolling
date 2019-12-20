@@ -47,4 +47,24 @@ class TransactionHistoryRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * @param $lowerBound
+     * @param $upperBound
+     * @return TransactionHistory[]
+     */
+    public function findAllInDateRange($lowerBound,$upperBound): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.date > :lowerBound')
+            ->andWhere('p.date < :upperBound')
+            ->setParameter('lowerBound', $lowerBound)
+            ->setParameter('upperBound', $upperBound)
+            ->orderBy('p.date', 'ASC');
+
+        $query = $qb->getQuery();
+
+        return $query->execute();
+    }
+
 }

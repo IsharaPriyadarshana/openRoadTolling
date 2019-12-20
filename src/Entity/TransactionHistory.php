@@ -47,7 +47,7 @@ class TransactionHistory
     private $toll;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="datetime", length=6, nullable=true)
      */
     private $date;
 
@@ -92,17 +92,7 @@ class TransactionHistory
         return $this;
     }
 
-    public function getDate(): ?string
-    {
-        return $this->date;
-    }
-
-    public function setDate(?string $date): self
-    {
-        $this->date = $date;
-
-        return $this;
-    }
+  
 
     public function getUser(): ?User
     {
@@ -136,6 +126,18 @@ class TransactionHistory
     public function setVehicleNo(?string $vehicleNo): self
     {
         $this->vehicleNo = $vehicleNo;
+
+        return $this;
+    }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(?\DateTimeInterface $date): self
+    {
+        $this->date = $date;
 
         return $this;
     }

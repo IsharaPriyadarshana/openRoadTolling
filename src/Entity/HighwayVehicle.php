@@ -36,7 +36,7 @@ class HighwayVehicle
     private $toll;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $enterTime;
 
@@ -46,7 +46,7 @@ class HighwayVehicle
     private $user;
 
     /**
-     * @ORM\Column(type="string", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
     private $exitTime;
 
@@ -126,29 +126,7 @@ class HighwayVehicle
         return $this;
     }
 
-    public function getEnterTime(): ?string
-    {
-        return $this->enterTime;
-    }
 
-    public function setEnterTime(?string $enterTime): self
-    {
-        $this->enterTime = $enterTime;
-
-        return $this;
-    }
-
-    public function getExitTime(): ?string
-    {
-        return $this->exitTime;
-    }
-
-    public function setExitTime(?string $exitTime): self
-    {
-        $this->exitTime = $exitTime;
-
-        return $this;
-    }
 
     public function getUser(): ?User
     {
@@ -170,6 +148,30 @@ class HighwayVehicle
     public function setDrivedBy(?string $drivedBy): self
     {
         $this->drivedBy = $drivedBy;
+
+        return $this;
+    }
+
+    public function getEnterTime(): ?\DateTimeInterface
+    {
+        return $this->enterTime;
+    }
+
+    public function setEnterTime(?\DateTimeInterface $enterTime): self
+    {
+        $this->enterTime = $enterTime;
+
+        return $this;
+    }
+
+    public function getExitTime(): ?\DateTimeInterface
+    {
+        return $this->exitTime;
+    }
+
+    public function setExitTime(?\DateTimeInterface $exitTime): self
+    {
+        $this->exitTime = $exitTime;
 
         return $this;
     }

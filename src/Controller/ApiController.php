@@ -19,6 +19,7 @@ use App\Repository\UserRepository;
 use App\Repository\VehicleClassRepository;
 use App\Repository\VehicleRepository;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use FOS\RestBundle\Controller\Annotations as FOSRest;
@@ -124,7 +125,7 @@ class ApiController extends AbstractFOSRestController
                 $em = $this->getDoctrine()->getManager();
                 $conn =$em->getConnection();
                 $macAddress = $request->get('macAddress');
-                $timeStamp = $request->get('time');
+                $timeStamp = $this->convertTime($request->get('time'));
                 $vehicleNo = $request->get('vehicleNo');
                 $vehicle = $vehicleRepository->findByVehicleNo($vehicleNo)[0];
                 $isIn = $highwayVehicleRepository->findByVehicle($vehicle);
@@ -517,6 +518,54 @@ class ApiController extends AbstractFOSRestController
 
     }
 
+    /**
+     * Test
+     * @FOSRest\Post("/camera_data")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param UserPasswordEncoderInterface $passwordEncoder
+     * @return RES
+     */
+    public function postCameraData(Request $request, UserRepository $userRepository, UserPasswordEncoderInterface $passwordEncoder, TransactionHistoryRepository $transactionHistoryRepository, HighwayVehicleRepository $highwayVehicleRepository)
+    {
+        $user = $userRepository->findBy(['email' => $request->get('email')]);
+        if (count($user)){
+            $user = $user[0];
+            if($passwordEncoder->isPasswordValid($user,$request->get('password')) & ($user->getEmail()=="admin@etc.com")){
+
+                $camera_vehicles = explode(",", $request->get("vehicles"));
+                $duration = explode("|",$request->get("duration"));
+                $duration[0] = $this->convertTime($duration[0]);
+                $duration[1] = $this->convertTime($duration[1]);
+                $vehicles = array();
+                for($i=0;$i<sizeof($camera_vehicles);$i++){
+                    $vehicles[$i] = explode("|",$camera_vehicles[$i]);
+                    $vehicles[$i][1] = $this->convertTime($vehicles[$i][1]);
+                }
+
+
+                $successfulTransactions=$transactionHistoryRepository->findAllInDateRange($duration[0],$duration[1]);
+                $pendingTransactions= $highwayVehicleRepository->findAllInDateRange($duration[0],$duration[1]);
+
+                $violationUnregistered = $this->unregisteredVehicles($vehicles)[0];
+                $vehicles = array_values($this->unregisteredVehicles($vehicles)[1]);
+
+                var_dump($vehicles);
+                $message = "";
+            } else {
+                $message = "Invalid Credentials!";
+            }
+
+            return new RES($message,RES::HTTP_OK);
+        }else {
+            return new RES("User Not Found",RES::HTTP_NOT_FOUND);
+        }
+
+    }
+
+
+
 //    /**
 //     * Test
 //     * @FOSRest\Post("/register_vehicle")
@@ -643,7 +692,7 @@ class ApiController extends AbstractFOSRestController
             $transaction->setVehicleNo($highwayVehicle->getVehicle()->getVehicleNo());
             $transaction->setToll($highwayVehicle->getToll());
             date_default_timezone_set('Asia/Colombo');
-            $transaction->setDate(date('m/d/Y h:i:s a'));
+            $transaction->setDate($highwayVehicle->getExitTime());
             $em->persist($transaction);
             $em->flush();
 
@@ -676,4 +725,53 @@ class ApiController extends AbstractFOSRestController
         }
         return json_encode($jsonTransactions);
     }
+
+    public function unregisteredVehicles( $vehicles){
+
+        $unregistered = array();
+        $vehicleDirectory = $this->getDoctrine()->getRepository(Vehicle::class);
+        $arrVehicles=$vehicles;
+        for ($i=0;$i<sizeof($arrVehicles);$i++){
+                if(sizeof($vehicleDirectory->findByVehicleNo($arrVehicles[$i][0])) ==0){
+                    array_push($unregistered,[$arrVehicles[$i][0],$arrVehicles[$i][1]]);
+                    unset($vehicles[$i]);
+                }
+            }
+        unset($arrVehicles);
+        return array($unregistered,$vehicles);
+    }
+
+
+//    public function underBalanced(  $highwayVehicles,$vehicles){
+//
+//        /**
+//         * @var HighwayVehicle[] $pendingTransactions
+//         */
+//        $pendingTransactions = $highwayVehicles;
+//
+//
+//
+//        $violated = array();
+//        foreach ($vehicles as $vehicle){
+//           foreach ($pendingTransactions as $pendingTransaction){
+//               if($vehicle[0] == $pendingTransaction->getVehicle()->getVehicleNo()){
+//                   array_push($violated,$pendingTransaction);
+//                   break;
+//               }
+//           }
+//        }
+//        return $violated;
+//    }
+
+    public function convertTime($dateTime){
+        $arrDateTime = explode(" ",$dateTime);
+        $time = $arrDateTime[1];
+        $date = explode("/",$arrDateTime[0]);
+        $day = $date[0];
+        $month = $date[1];
+        $year = $date[2];
+
+        return $year."-".$month."-".$day." ".$time;
+    }
+
 }

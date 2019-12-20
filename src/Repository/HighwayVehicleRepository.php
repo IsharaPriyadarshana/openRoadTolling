@@ -47,4 +47,24 @@ class HighwayVehicleRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    /**
+     * @param $lowerBound
+     * @param $upperBound
+     * @return HighwayVehicle[]
+     */
+    public function findAllInDateRange($lowerBound,$upperBound): array
+    {
+        $qb = $this->createQueryBuilder('v')
+            ->where('v.exitTime > :lowerBound')
+            ->andWhere('v.exitTime < :upperBound')
+            ->setParameter('lowerBound', $lowerBound)
+            ->setParameter('upperBound', $upperBound)
+            ->orderBy('v.exitTime', 'ASC');
+
+        $query = $qb->getQuery();
+
+        return $query->execute();
+    }
+
 }
