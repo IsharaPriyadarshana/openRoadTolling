@@ -106,14 +106,14 @@ class ProcessData extends Command
               unset($vehicles[$x]);
           }
 
-          $vehicles= array_values($vehicles);
-          foreach ($vehicles as $vehicle){
-              $vehicle->setViolationType(4);
-              $this->em->flush();
-          }
 
       }
-
+        $vehicles= array_values($vehicles);
+        foreach ($vehicles as $vehicle){
+            $vehicle->setViolationType(4);
+            $this->em->flush();
+        }
+var_dump("sdsdsdsd");
     }
 
     public function unregisteredVehicles( $vehicles){

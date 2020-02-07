@@ -35,6 +35,11 @@ class AccessPoint
      */
     private $ssid;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $gps;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -84,6 +89,18 @@ class AccessPoint
     public function setHighwayExtension(?HighwayExtension $highwayExtension): self
     {
         $this->highwayExtension = $highwayExtension;
+
+        return $this;
+    }
+
+    public function getGps(): ?string
+    {
+        return $this->gps;
+    }
+
+    public function setGps(?string $gps): self
+    {
+        $this->gps = $gps;
 
         return $this;
     }
