@@ -65,7 +65,7 @@ class ProcessData extends Command
         $vehicles = $this->em->getRepository(Violation::class)->findAllInDateRange($duration[0],$duration[1]);
 
         //Get unpaid pending transactions
-        $pendingTransactions= $this->em->getRepository(HighwayVehicle::class)->findAllInDateRange($duration[0],$duration[1]);
+        $pendingTransactions= $this->em->getRepository(HighwayVehicle::class)->findAllInDateRange($duration[0],$duration[1],0);
 
         //remove unregistered vehicles after setting their violation no to 1
         $vehicles = array_values($this->unregisteredVehicles($vehicles));
@@ -74,7 +74,7 @@ class ProcessData extends Command
         $vehicles = array_values($this->unpaidVehicles($vehicles,$pendingTransactions));
 
         // remove vehicles that have not exited properly by app setting their violation type to 3
-        $vehicles = array_values($this->unExitVehicles($vehicles));
+        $vehicles = array_values($this->unExitVehicles($vehicles,$duration));
 
         // The vehicles that are left neither entered nor exited properly but are registered on the system
         foreach ($vehicles as $vehicle){
@@ -118,34 +118,36 @@ class ProcessData extends Command
         return $vehicles;
     }
 
-    public function unExitVehicles($vehicles){
+    public function unExitVehicles($vehicles,$duration){
         $api = new ApiController();
-        for ($x=0;$x<sizeof($vehicles);$x++){
-            $vehicleObj = $this->em->getRepository(Vehicle::class)->findByVehicleNo($vehicles[$x]->getVehicleNo())[0];
-            $user =  $vehicleObj->getUser()[0];
-            $vehicles[$x]->setUser($user);
-            $inHW = $this->em->getRepository(HighwayVehicle::class);
-            if($inHW->findByVehicle($vehicleObj)){
+        $pendingTransactions = $this->em->getRepository(HighwayVehicle::class)->findByIsCurrentlyIn(1);
+
+        $total = sizeof($vehicles);
+        for($i=0;$i<$total;$i++){
+
+            foreach ($pendingTransactions as $pendingTransaction){
                 /**
-                 * @var HighwayVehicle $hWVehicle
+                 * @var HighwayVehicle $pendingTransaction
                  */
-                $hWVehicle = $inHW->findByVehicle($vehicleObj)[0];
-                $hWVehicle->setExitTime($vehicles[$x]->getDate());
-                $hWVehicle->setEgress($vehicles[$x]->getInterchange());
-                $hWVehicle->setIsCurrentlyIn(0);
-                $hWVehicle->setDrivedBy($vehicles[$x]->getUser()->getId());
-                $hWVehicle->setUser(null);
-                $toll = $api->calculateToll($hWVehicle);
-                $hWVehicle->setToll($toll);
-                $user->setPendingTransaction(1);
-                $vehicles[$x]->setViolationType(3);
-                $vehicles[$x]->setToll($toll);
-                $this->em->flush();
-                unset($vehicles[$x]);
+                if($vehicles[$i]->getVehicleNo() == $pendingTransaction->getVehicle()->getVehicleNo()){
+                    $user = $pendingTransaction->getUser();
+                    $pendingTransaction->setExitTime($vehicles[$i]->getDate());
+                    $pendingTransaction->setEgress($vehicles[$i]->getInterchange());
+                    $pendingTransaction->setIsCurrentlyIn(0);
+                    $pendingTransaction->setDrivedBy($user->getId());
+                    $toll = $api->calculateToll($pendingTransaction);
+                    $pendingTransaction->setToll($toll);
+                    $user->setPendingTransaction(1);
+                    $vehicles[$i]->setViolationType(3);
+                    $vehicles[$i]->setToll($toll);
+                    $pendingTransaction->setUser(null);
+                    $this->em->flush();
+                    unset($vehicles[$i]);
+                    break;
+                }
             }
-
-
         }
+
         return $vehicles;
     }
 }

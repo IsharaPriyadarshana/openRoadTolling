@@ -51,16 +51,18 @@ class HighwayVehicleRepository extends ServiceEntityRepository
     /**
      * @param $lowerBound
      * @param $upperBound
+     * @param $isCurrentlyIn
      * @return HighwayVehicle[]
      */
-    public function findAllInDateRange($lowerBound,$upperBound): array
+    public function findAllInDateRange($lowerBound,$upperBound,$isCurrentlyIn): array
     {
         $qb = $this->createQueryBuilder('v')
             ->where('v.exitTime > :lowerBound')
             ->andWhere('v.exitTime < :upperBound')
-            ->andWhere('v.isCurrentlyIn =0')
+            ->andWhere('v.isCurrentlyIn = :isCurrentlyIn')
             ->setParameter('lowerBound', $lowerBound)
             ->setParameter('upperBound', $upperBound)
+            ->setParameter('isCurrentlyIn', $isCurrentlyIn)
             ->orderBy('v.exitTime', 'ASC');
 
         $query = $qb->getQuery();
