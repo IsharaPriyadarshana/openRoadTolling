@@ -113,7 +113,6 @@ class ProcessData extends Command
             $vehicle->setViolationType(4);
             $this->em->flush();
         }
-var_dump("sdsdsdsd");
     }
 
     public function unregisteredVehicles( $vehicles){
