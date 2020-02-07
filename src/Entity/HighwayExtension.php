@@ -52,7 +52,10 @@ class HighwayExtension
      */
     private $codeName;
 
-
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Violation", mappedBy="interchange")
+     */
+    private $violation;
 
     /**
      * @ORM\Column(type="integer")
@@ -64,6 +67,7 @@ class HighwayExtension
         $this->entranceExtension = new ArrayCollection();
         $this->egressExtension = new ArrayCollection();
         $this->accessPoint = new ArrayCollection();
+        $this->violation = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -220,6 +224,37 @@ class HighwayExtension
             // set the owning side to null (unless already changed)
             if ($accessPoint->getHighwayExtension() === $this) {
                 $accessPoint->setHighwayExtension(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Violation[]
+     */
+    public function getViolation(): Collection
+    {
+        return $this->violation;
+    }
+
+    public function addViolation(Violation $violation): self
+    {
+        if (!$this->violation->contains($violation)) {
+            $this->violation[] = $violation;
+            $violation->setInterchange($this);
+        }
+
+        return $this;
+    }
+
+    public function removeViolation(Violation $violation): self
+    {
+        if ($this->violation->contains($violation)) {
+            $this->violation->removeElement($violation);
+            // set the owning side to null (unless already changed)
+            if ($violation->getInterchange() === $this) {
+                $violation->setInterchange(null);
             }
         }
 

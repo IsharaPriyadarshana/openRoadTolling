@@ -87,6 +87,11 @@ class User implements UserInterface
     private $highwayVehicle;
 
     /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Violation", mappedBy="user")
+     */
+    private $violation;
+
+    /**
      * @ORM\Column(type="string",length=10, nullable=true)
      */
     private $revisionNo;
@@ -113,6 +118,7 @@ class User implements UserInterface
     {
         $this->vehicle = new ArrayCollection();
         $this->transaction = new ArrayCollection();
+        $this->violation = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -361,6 +367,37 @@ class User implements UserInterface
     public function setPendingTransaction(bool $pendingTransaction): self
     {
         $this->pendingTransaction = $pendingTransaction;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Violation[]
+     */
+    public function getViolation(): Collection
+    {
+        return $this->violation;
+    }
+
+    public function addViolation(Violation $violation): self
+    {
+        if (!$this->violation->contains($violation)) {
+            $this->violation[] = $violation;
+            $violation->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeViolation(Violation $violation): self
+    {
+        if ($this->violation->contains($violation)) {
+            $this->violation->removeElement($violation);
+            // set the owning side to null (unless already changed)
+            if ($violation->getUser() === $this) {
+                $violation->setUser(null);
+            }
+        }
 
         return $this;
     }

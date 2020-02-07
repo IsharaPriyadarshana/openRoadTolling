@@ -10,6 +10,7 @@ use App\Entity\Transaction;
 use App\Entity\TransactionHistory;
 use App\Entity\User;
 use App\Entity\Vehicle;
+use App\Entity\Violation;
 use App\Repository\AccessPointRepository;
 use App\Repository\HighwayExtensionRepository;
 use App\Repository\HighwayVehicleRepository;
@@ -125,7 +126,7 @@ class ApiController extends AbstractFOSRestController
                 $em = $this->getDoctrine()->getManager();
                 $conn =$em->getConnection();
                 $macAddress = $request->get('macAddress');
-                $timeStamp = $this->convertTime($request->get('time'));
+                $timeStamp = DateTime::createFromFormat('Y-m-d H:i:s',$this->convertTime($request->get('time')));
                 $vehicleNo = $request->get('vehicleNo');
                 $vehicle = $vehicleRepository->findByVehicleNo($vehicleNo)[0];
                 $isIn = $highwayVehicleRepository->findByVehicle($vehicle);
@@ -535,24 +536,27 @@ class ApiController extends AbstractFOSRestController
             if($passwordEncoder->isPasswordValid($user,$request->get('password')) & ($user->getEmail()=="admin@etc.com")){
 
                 $camera_vehicles = explode(",", $request->get("vehicles"));
-                $duration = explode("|",$request->get("duration"));
-                $duration[0] = $this->convertTime($duration[0]);
-                $duration[1] = $this->convertTime($duration[1]);
                 $vehicles = array();
                 for($i=0;$i<sizeof($camera_vehicles);$i++){
                     $vehicles[$i] = explode("|",$camera_vehicles[$i]);
                     $vehicles[$i][1] = $this->convertTime($vehicles[$i][1]);
                 }
 
+                $interchange = $this->getDoctrine()->getRepository(HighwayExtension::class)->findByCodeName($request->get("codeName"))[0];
+                $em = $this->getDoctrine()->getManager();
+                foreach ($vehicles as $vehicle){
+                    $violation = new Violation();
+                    $violation->setVehicleNo($vehicle[0]);
+                    $violation->setDate(DateTime::createFromFormat('Y-m-d H:i:s',$vehicle[1]));
+                    $violation->setInterchange($interchange);
+                    $violation->setViolationType(0);
+                    $em->persist($violation);
+                }
+                $em->flush();
 
-                $successfulTransactions=$transactionHistoryRepository->findAllInDateRange($duration[0],$duration[1]);
-                $pendingTransactions= $highwayVehicleRepository->findAllInDateRange($duration[0],$duration[1]);
 
-                $violationUnregistered = $this->unregisteredVehicles($vehicles)[0];
-                $vehicles = array_values($this->unregisteredVehicles($vehicles)[1]);
 
-                var_dump($vehicles);
-                $message = "";
+                $message = "Success";
             } else {
                 $message = "Invalid Credentials!";
             }
@@ -684,8 +688,8 @@ class ApiController extends AbstractFOSRestController
             $transaction->setUser($user);
             $transaction->setEntrance($highwayVehicle->getEntrance()->getName());
             $transaction->setEgress($highwayVehicle->getEgress()->getName());
-            $datetime1 = new DateTime(str_replace('/','-',$highwayVehicle->getEnterTime()));
-            $datetime2 = new DateTime(str_replace('/','-',$highwayVehicle->getExitTime()));
+            $datetime1 = $highwayVehicle->getEnterTime();
+            $datetime2 = $highwayVehicle->getExitTime();
             $interval = date_diff($datetime2, $datetime1);
             $hrs = $interval->format('%h') + ($interval->days * 24) + ($interval->format('%i') / 60);
             $transaction->setDuration(round($hrs,2)." hours");
@@ -726,20 +730,6 @@ class ApiController extends AbstractFOSRestController
         return json_encode($jsonTransactions);
     }
 
-    public function unregisteredVehicles( $vehicles){
-
-        $unregistered = array();
-        $vehicleDirectory = $this->getDoctrine()->getRepository(Vehicle::class);
-        $arrVehicles=$vehicles;
-        for ($i=0;$i<sizeof($arrVehicles);$i++){
-                if(sizeof($vehicleDirectory->findByVehicleNo($arrVehicles[$i][0])) ==0){
-                    array_push($unregistered,[$arrVehicles[$i][0],$arrVehicles[$i][1]]);
-                    unset($vehicles[$i]);
-                }
-            }
-        unset($arrVehicles);
-        return array($unregistered,$vehicles);
-    }
 
 
 //    public function underBalanced(  $highwayVehicles,$vehicles){

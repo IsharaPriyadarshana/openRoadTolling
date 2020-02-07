@@ -62,8 +62,10 @@ class Vehicle
 
         return $this;
     }
-
-    public function getUser(): ?User
+    /**
+     * @return Collection|User[]
+     */
+    public function getUser(): ?Collection
     {
         return $this->user;
     }

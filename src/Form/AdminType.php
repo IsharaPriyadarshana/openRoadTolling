@@ -19,7 +19,7 @@ class AdminType extends AbstractType
             ->add('highwayCodeName',TextType::class,['label'=>'Code Name', 'required' => false, 'attr'=>['placeholder'=>" Code Name",'maxLength'=>"8"]])
             ->add('highwayExtensionName',TextType::class,['label'=>'Name', 'required' => false, 'attr'=>['placeholder'=>"Name"]])
             ->add('highwayExtensionCodeName',TextType::class,['label'=>'Code Name', 'required' => false, 'attr'=>['placeholder'=>"Code Name",'maxLength'=>"8"]])
-            ->add('sequenceNo',TextType::class,['label'=>'Sequence Number','required' => false,  'attr'=>['placeholder'=>"Sequence Number"]])
+            ->add('sequenceNo',TextType::class,['label'=>'Distance (from beginning)','required' => false,  'attr'=>['placeholder'=>"Distance (from beginning)"]])
             ->add('apNames',TextType::class,['label'=>'AP Names','required' => false,  'attr'=>['placeholder'=>"AP Names (Separated by Commas)"]])
             ->add('accessKey',TextType::class,['label'=>'Access Key','required' => false,  'attr'=>['placeholder'=>"Access Key"]])
             ->add('macAddress',TextType::class,['label'=>'MAC Address','required' => false,  'attr'=>['placeholder'=>"MAC Addresses (Separated by Commas)"]])
