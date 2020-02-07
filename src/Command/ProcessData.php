@@ -65,18 +65,20 @@ class ProcessData extends Command
         $pendingTransactions= $this->em->getRepository(HighwayVehicle::class)->findAllInDateRange($duration[0],$duration[1]);
         $vehicles = array_values($this->unregisteredVehicles($vehicles)[1]);
 
-        $k=0;
+
       if(sizeof($pendingTransactions)!=0){
           for($j=0;$j<sizeof($vehicles);$j++){
-              if($vehicles[$j]->getVehicleNo() == $pendingTransactions[$k]->getVehicle()->getVehicleNo()){
-                  $vehicles[$j]->setDate($pendingTransactions[$k]->getExitTime());
-                  $vehicles[$j]->setViolationType(2);
-                  $vehicles[$j]->setToll($pendingTransactions[$k]->getToll());
-                  $vehicles[$j]->setUser($this->em->getRepository(User::class)->find($pendingTransactions[$k]->getDrivedBy()));
-                  $this->em->flush();
-                  unset($vehicles[$j]);
-                  $k++;
-              }
+            for($k=0;$k<sizeof($pendingTransactions);$k++){
+                if($vehicles[$j]->getVehicleNo() == $pendingTransactions[$k]->getVehicle()->getVehicleNo()){
+                    $vehicles[$j]->setDate($pendingTransactions[$k]->getExitTime());
+                    $vehicles[$j]->setViolationType(2);
+                    $vehicles[$j]->setToll($pendingTransactions[$k]->getToll());
+                    $vehicles[$j]->setUser($this->em->getRepository(User::class)->find($pendingTransactions[$k]->getDrivedBy()));
+                    $this->em->flush();
+                    unset($vehicles[$j]);
+                    $k++;
+                }
+            }
           }
       }
 

@@ -58,6 +58,7 @@ class HighwayVehicleRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('v')
             ->where('v.exitTime > :lowerBound')
             ->andWhere('v.exitTime < :upperBound')
+            ->andWhere('v.isCurrentlyIn =0')
             ->setParameter('lowerBound', $lowerBound)
             ->setParameter('upperBound', $upperBound)
             ->orderBy('v.exitTime', 'ASC');
