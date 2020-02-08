@@ -1,7 +1,6 @@
 {% extends('base.html.twig') %}
 {% block title %}Welcome- Administrator!{% endblock %}
               {% block dropDown %}
-                  Data
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <a class="dropdown-item" href="{{ path('admin')  }}"> Edit Data</a>
@@ -95,125 +94,291 @@
                 </table>
             {% elseif id=='highwayInterchanges' %}
                 <h3>Highway Interchanges</h3>
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Highway</th>
-                        <th>Interchange Name</th>
-                        <th>Interchange Code Name</th>
-                        <th>Distance (From Beginning)</th>
-                        <th>Access Key</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if( highwayExtensions|length >0) %}
-                        {% for highwayExtension in highwayExtensions %}
-                            <tr>
-                                <td>{{ highwayExtension.highway.name }}</td>
-                                <td>{{ highwayExtension.name }}</td>
-                                <td>{{ highwayExtension.codeName }}</td>
-                                <td>{{ highwayExtension.sequenceNo }}</td>
-                                <td>{{ highwayExtension.accessKey }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                    </tbody>
-                </table>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="list-group" id="list-tab" role="tablist">
+                                        {%  for highway in highways %}
+                                            <a class="list-group-item list-group-item-action" id="{{highway.name}}" data-toggle="list" href="" role="tab" aria-controls="{{highway.codename}}">{{highway.name}}</a>
+                                            <script type="text/javascript">
+                                                document.getElementById('{{highway.name}}').href = '#' + '{{highway.codename}}';
+                                            </script>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="tab-content" id="nav-tabContent">
+                                        {%  for highway in highways %}
+                                            <div class="tab-pane fade show" id="{{highway.codename}}" role="tabpanel" aria-labelledby="{{highway.name}}">
+                                                <div class="overflow-auto" style="max-width: 650px; max-height: 400px;">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Interchange Name</th>
+                                                            <th>Interchange Code Name</th>
+                                                            <th>Distance (From Beginning)</th>
+                                                            <th>Access Key</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {% if( highwayExtensions|length >0) %}
+                                                            {% for highwayExtension in highwayExtensions|filter(highwayExtension => highwayExtension.highway == highway) %}
+                                                                <tr>
+                                                                    <td>{{ highwayExtension.name }}</td>
+                                                                    <td>{{ highwayExtension.codeName }}</td>
+                                                                    <td>{{ highwayExtension.sequenceNo }}</td>
+                                                                    <td>{{ highwayExtension.accessKey }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
             {% elseif id=='accessPoints' %}
                 <h3>Access Points</h3>
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Highway Interchange Name</th>
-                        <th> Access Point Name</th>
-                        <th> Mac Address</th>
-                        <th> SSID</th>
-                        <th> GPS Tag</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if( accessPoints|length >0) %}
-                        {% for accessPoint in accessPoints %}
-                            <tr>
-                                <td>{{ accessPoint.id }}</td>
-                                <td>{{ accessPoint.highwayExtension.name }}</td>
-                                <td>{{ accessPoint.name }}</td>
-                                <td>{{ accessPoint.macAddress }}</td>
-                                <td>{{ accessPoint.ssid }}</td>
-                                <td>{{ accessPoint.gps }}</td>
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                    </tbody>
-                </table>
+
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="list-group" id="list-tab" role="tablist">
+                                        {%  for highway in highways %}
+                                            <a class="list-group-item list-group-item-action" id="{{highway.name}}" data-toggle="list" href="" role="tab" aria-controls="{{highway.codename}}">{{highway.name}}</a>
+                                            <script type="text/javascript">
+                                                document.getElementById('{{highway.name}}').href = '#' + '{{highway.codename}}';
+                                            </script>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="tab-content" id="nav-tabContent">
+                                        {%  for highway in highways %}
+                                            <div class="tab-pane fade show" id="{{highway.codename}}" role="tabpanel" aria-labelledby="{{highway.name}}">
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        <div class="list-group" id="list-tab" role="tablist">
+                                                            {%  for highwayExtension in highwayExtensions|filter(highwayExtension => highwayExtension.highway == highway) %}
+                                                                <a class="list-group-item list-group-item-action" id="{{highwayExtension.name}}" data-toggle="list" href="" role="tab" aria-controls="{{highwayExtension.codename}}">{{highwayExtension.name}}</a>
+                                                                <script type="text/javascript">
+                                                                    document.getElementById('{{highwayExtension.name}}').href = '#' + '{{highwayExtension.codename}}';
+                                                                </script>
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <div class="tab-content" id="nav-tabContent">
+                                                            {%  for highwayExtension in highwayExtensions|filter(highwayExtension => highwayExtension.highway == highway) %}
+                                                                <div class="tab-pane fade show" id="{{highwayExtension.codename}}" role="tabpanel" aria-labelledby="{{highwayExtension.name}}">
+                                                                    <div class="overflow-auto" style="max-width: 650px; max-height: 400px;">
+                                                                        <font size="1">
+                                                                        <table class="table table-hover">
+                                                                            <thead>
+                                                                            <tr>
+                                                                                <th> Access Point Name</th>
+                                                                                <th> Mac Address</th>
+                                                                                <th> SSID</th>
+                                                                                <th> GPS Tag</th>
+                                                                            </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                            {% if( accessPoints|length >0) %}
+                                                                                {% for accessPoint in accessPoints|filter(acccessPoint => acccessPoint.highwayExtension == highwayExtension) %}
+                                                                                    <tr>
+                                                                                        <td>{{ accessPoint.name }}</td>
+                                                                                        <td>{{ accessPoint.macAddress }}</td>
+                                                                                        <td>{{ accessPoint.ssid }}</td>
+                                                                                        <td>{{ accessPoint.gps }}</td>
+                                                                                    </tr>
+                                                                                {% endfor %}
+                                                                            {% endif %}
+                                                                            </tbody>
+                                                                        </table>
+                                                                        </font>
+                                                                    </div>
+
+                                                                </div>
+                                                            {% endfor %}
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
             {% elseif id=='highwayVehicles' %}
             <h3>Vehicles in Highway</h3>
-            <table class="table table-hover">
-                <thead>
-                <tr>
-                    <th>Vehicle No</th>
-                    <th> Vehicle Type</th>
-                    <th>Entrance</th>
-                    <th> Enter Time</th>
-                    <th> Driver</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% if( highwayVehicles|length >0) %}
-                    {% for highwayVehicle in highwayVehicles %}
-                        <tr>
-                            <td>{{ highwayVehicle.vehicle.vehicleNo }}</td>
-                            <td>{{ highwayVehicle.vehicle.class.className }}</td>
-                            <td>{{ highwayVehicle.entrance.name }}</td>
-                            <td>{{ highwayVehicle.enterTime|date('Y-m-d H:i:s')}}</td>
-                            <td>{{ highwayVehicle.user.firstName~" "~highwayVehicle.user.lastName }}</td>
-                        </tr>
-                    {% endfor %}
-                {% endif %}
-                </tbody>
-            </table>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="list-group" id="list-tab" role="tablist">
+                                        {%  for highway in highways %}
+                                            <a class="list-group-item list-group-item-action" id="{{highway.name}}" data-toggle="list" href="" role="tab" aria-controls="{{highway.codename}}">{{highway.name}}</a>
+                                            <script type="text/javascript">
+                                                document.getElementById('{{highway.name}}').href = '#' + '{{highway.codename}}';
+                                            </script>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="tab-content" id="nav-tabContent">
+                                        {%  for highway in highways %}
+                                            <div class="tab-pane fade show" id="{{highway.codename}}" role="tabpanel" aria-labelledby="{{highway.name}}">
+                                                <div class="overflow-auto" style="max-width: 650px; max-height: 400px;">
+                                                    <table class="table table-hover">
+                                                        <thead>
+                                                        <tr>
+                                                            <th>Vehicle No</th>
+                                                            <th> Vehicle Type</th>
+                                                            <th>Entrance</th>
+                                                            <th> Enter Time</th>
+                                                            <th> Driver</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {% if( highwayVehicles|length >0) %}
+                                                            {% for highwayVehicle in highwayVehicles|filter(highwayVehicle => highwayVehicle.entrance.highway == highway) %}
+                                                                <tr>
+                                                                    <td>{{ highwayVehicle.vehicle.vehicleNo }}</td>
+                                                                    <td>{{ highwayVehicle.vehicle.class.className }}</td>
+                                                                    <td>{{ highwayVehicle.entrance.name }}</td>
+                                                                    <td>{{ highwayVehicle.enterTime|date('Y-m-d H:i:s')}}</td>
+                                                                    <td>{{ highwayVehicle.user.firstName~" "~highwayVehicle.user.lastName }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
             {% elseif id=='pendingVehicles' %}
                 <h3>Pending Transactions</h3>
-                <table class="table table-hover">
-                    <thead>
-                    <tr>
-                        <th>Vehicle No</th>
-                        <th> Vehicle Type</th>
-                        <th>Entrance</th>
-                        <th> Enter Time</th>
-                        <th> Exit</th>
-                        <th> Exit Time</th>
-                        <th> Toll</th>
-                        <th> Driver</th>
-                        <th> Current Balance</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% if( pendingVehicles|length >0) %}
-                        {% for pendingVehicle in pendingVehicles %}
-                            <tr>
-                                <td>{{ pendingVehicle.vehicle.vehicleNo }}</td>
-                                <td>{{ pendingVehicle.vehicle.class.className }}</td>
-                                <td>{{ pendingVehicle.entrance.name }}</td>
-                                <td>{{ pendingVehicle.enterTime|date('Y-m-d H:i:s') }}</td>
-                                <td>{{ pendingVehicle.egress.name }}</td>
-                                <td>{{ pendingVehicle.exitTime|date('Y-m-d H:i:s') }}</td>
-                                <td>{{ pendingVehicle.toll }}</td>
 
-                                    {% for user in users %}
-                                        {% if user.id ==pendingVehicle.drivedBy  %}
-                                            <td>{{ user.firstName~" "~user.lastName }}</td>
-                                            <td>{{ user.account.balance }}</td>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
 
-                                        {% endif %}
-                                    {% endfor %}
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="list-group" id="list-tab" role="tablist">
+                                        {%  for highway in highways %}
+                                            <a class="list-group-item list-group-item-action" id="{{highway.name}}" data-toggle="list" href="" role="tab" aria-controls="{{highway.codename}}">{{highway.name}}</a>
+                                            <script type="text/javascript">
+                                                document.getElementById('{{highway.name}}').href = '#' + '{{highway.codename}}';
+                                            </script>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="tab-content" id="nav-tabContent">
+                                        {%  for highway in highways %}
+                                            <div class="tab-pane fade show" id="{{highway.codename}}" role="tabpanel" aria-labelledby="{{highway.name}}">
+                                                <div class="overflow-auto" style="max-width: 650px; max-height: 400px;">
+                                                   <font size="1">
+                                                       <table class="table table-hover">
+                                                           <thead>
+                                                           <tr>
+                                                               <th>Vehicle No</th>
+                                                               <th> Vehicle Type</th>
+                                                               <th>Entrance</th>
+                                                               <th> Enter Time</th>
+                                                               <th> Exit</th>
+                                                               <th> Exit Time</th>
+                                                               <th> Toll</th>
+                                                               <th> Driver</th>
+                                                               <th> Current Balance</th>
+                                                           </tr>
+                                                           </thead>
+                                                           <tbody>
+                                                           {% if( pendingVehicles|length >0) %}
+                                                               {% for pendingVehicle in pendingVehicles|filter(pendingVehicle => pendingVehicle.entrance.highway == highway ) %}
+                                                                   <tr>
+                                                                       <td>{{ pendingVehicle.vehicle.vehicleNo }}</td>
+                                                                       <td>{{ pendingVehicle.vehicle.class.className }}</td>
+                                                                       <td>{{ pendingVehicle.entrance.name }}</td>
+                                                                       <td>{{ pendingVehicle.enterTime|date('Y-m-d H:i:s') }}</td>
+                                                                       <td>{{ pendingVehicle.egress.name }}</td>
+                                                                       <td>{{ pendingVehicle.exitTime|date('Y-m-d H:i:s') }}</td>
+                                                                       <td>{{ pendingVehicle.toll }}</td>
 
-                            </tr>
-                        {% endfor %}
-                    {% endif %}
-                    </tbody>
-                </table>
+                                                                       {% for user in users %}
+                                                                           {% if user.id ==pendingVehicle.drivedBy  %}
+                                                                               <td>{{ user.firstName~" "~user.lastName }}</td>
+                                                                               <td>{{ user.account.balance }}</td>
+
+                                                                           {% endif %}
+                                                                       {% endfor %}
+
+                                                                   </tr>
+                                                               {% endfor %}
+                                                           {% endif %}
+                                                           </tbody>
+                                                       </table>
+                                                   </font>
+
+
+                                                </div>
+
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
             {% endif %}
         </div>
     </div>

@@ -100,8 +100,10 @@ class ProcessData extends Command
     }
 
     public function unpaidVehicles($vehicles,$pendingTransactions){
+        $no = sizeof($vehicles);
+
         if(sizeof($pendingTransactions)!=0){
-            for($j=0;$j<sizeof($vehicles);$j++){
+            for($j=0;$j<$no;$j++){
                 for($k=0;$k<sizeof($pendingTransactions);$k++){
                     if($vehicles[$j]->getVehicleNo() == $pendingTransactions[$k]->getVehicle()->getVehicleNo()){
                         $vehicles[$j]->setDate($pendingTransactions[$k]->getExitTime());
@@ -110,6 +112,7 @@ class ProcessData extends Command
                         $vehicles[$j]->setUser($this->em->getRepository(User::class)->find($pendingTransactions[$k]->getDrivedBy()));
                         $this->em->flush();
                         unset($vehicles[$j]);
+                        break;
                         $k++;
                     }
                 }

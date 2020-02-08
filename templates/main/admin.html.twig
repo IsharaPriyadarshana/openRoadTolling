@@ -1,7 +1,6 @@
 {% extends('base.html.twig') %}
 {% block title %}Welcome- Administrator!{% endblock %}
               {% block dropDown %}
-                   Data
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                       <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
@@ -13,17 +12,6 @@
                   </div>
 
               {% endblock %}
-    {% block dropDownViolations %}
-        Violations
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown2">
-            <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">Unregistered Vehicles</a>
-            <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">Vehicles With Pending Transactions</a>
-            <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">Vehicles Haven't Exited Properly</a>
-            <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">Neither Entered nor Exited Properly</a>
-        </div>
-
-    {% endblock %}
 
 {% block body %}
 

@@ -67,4 +67,19 @@ class ViolationRepository extends ServiceEntityRepository
 
         return $query->execute();
     }
+
+    /**
+
+     * @return Violation[]
+     */
+    public function findAllErrorAssigned(): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->where('p.violationType != 0')
+            ->orderBy('p.date', 'ASC');
+
+        $query = $qb->getQuery();
+
+        return $query->execute();
+    }
 }

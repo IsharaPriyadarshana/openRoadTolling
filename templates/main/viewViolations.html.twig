@@ -1,0 +1,115 @@
+
+{% extends('base.html.twig') %}
+{% block title %}Welcome- Administrator!{% endblock %}
+{% block body %}
+    <div style="margin-top: 1cm;"></div>
+
+    {% block dropDown %}
+        </a>
+<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="{{ path('admin')  }}"> Edit Data</a>
+    <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
+    <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
+    <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
+    <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
+    <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
+    <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
+</div>
+    {% endblock %}
+
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+
+                <div class="row">
+                    <div class="col-4">
+                        <div class="list-group" id="list-tab" role="tablist">
+                            {%  for highway in highways %}
+                                <a class="{% if hw == highway.id  %}list-group-item list-group-item-action active {% else %}list-group-item list-group-item-action{% endif %}" id="{{highway.name}}" data-toggle="list" href="" role="tab" aria-controls="{{highway.codename}}">{{highway.name}}</a>
+                                <script type="text/javascript">
+                                    document.getElementById('{{highway.name}}').href = '#' + '{{highway.codename}}';
+                                </script>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="tab-content" id="nav-tabContent">
+                            {%  for highway in highways %}
+                            <div class="{% if hw == highway.id  %}tab-pane fade show active {% else %}tab-pane fade show{% endif %}" id="{{highway.codename}}" role="tabpanel" aria-labelledby="{{highway.name}}">
+
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="list-group" id="list-tab" role="tablist">
+                                            {%  for interchange in interchanges|filter(interchange => interchange.highway.codename == highway.codename) %}
+                                                <a class="{% if hwi == interchange.id  %}list-group-item list-group-item-action active {% else %}list-group-item list-group-item-action{% endif %}" id="{{interchange.name}}" data-toggle="list" href="" role="tab" aria-controls="{{interchange.codename}}">{{interchange.name}}</a>
+                                                <script type="text/javascript">
+                                                    document.getElementById('{{interchange.name}}').href = '#' + '{{interchange.codename}}';
+                                                </script>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    <div class="col-8">
+                                        <div class="tab-content" id="nav-tabContent">
+                                            {%  for interchange in  interchanges|filter(interchange => interchange.highway.codename == highway.codename) %}
+                                                <div class="{% if hwi == interchange.id  %}tab-pane fade show active {% else %}tab-pane fade show{% endif %}" id="{{interchange.codename}}" role="tabpanel" aria-labelledby="{{interchange.name}}">
+
+
+
+
+
+                                                        <a class="navbar-brand" href="#">Violations</a>
+                                                    <div style="margin-top: 0.5cm;"></div>
+                                                    <div class="overflow-auto" style="max-width: 400px; max-height: 400px;">
+                                                        {% for violation in violations|filter(violation => violation.interchange.codename == interchange.codename) %}
+                                                        <h4 id="{{violation.id~violation.vehicleNo}}">{{ violation.vehicleNo }}</h4>
+                                                        <p>
+                                                            <font color="#8a2be2">Licence Plate No: </font>    {{ violation.vehicleNo }}<br>
+                                                            <font color="#8a2be2">Driver: </font>         {% if violation.user == "" %} Unknown {% else %} {{ violation.user.firstName~" "~violation.user.lastName }}{% endif %}<br>
+                                                            <font color="#8a2be2">Toll: </font>{% if violation.toll == "" %} Maximum Penalty {% else %} {{ violation.toll }}{% endif %} <br>
+                                                            <font color="#8a2be2">Date: </font> {{ violation.date|date('Y-m-d H:i:s') }}<br>
+                                                            <font color="#8a2be2">Violation Type: </font>
+                                                            {%if violation.violationType == '1'  %}
+                                                                Unregistered Vehicle
+                                                            {% elseif violation.violationType == '2'  %}
+                                                                Pending Transaction
+                                                            {% elseif violation.violationType == '3'  %}
+                                                                Incorrectly Exited
+                                                            {% elseif violation.violationType == '4'  %}
+                                                                Incorrectly Entered and Exited
+                                                            {% endif %}
+                                                                <br>
+
+                                                            <a href="{{ path('viewViolations',{'id' : '1', 'remove': violation.id, 'hw': highway.id, 'hwi': interchange.id})  }}" class="btn btn-primary btn-sm" style="float: right;" id="{{violation.id~violation.vehicleNo}}">Remove</a>
+                                                            <div style="margin-top: 0.5cm;"></div>
+                                                        </p>
+                                                        {% endfor %}
+
+                                                    </div>
+
+
+
+                                                </div>
+                                            {% endfor %}
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+
+
+{% endblock %}

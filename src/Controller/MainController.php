@@ -7,6 +7,7 @@ use App\Entity\Highway;
 use App\Entity\HighwayExtension;
 use App\Entity\User;
 use App\Entity\VehicleClass;
+use App\Entity\Violation;
 use App\Form\AdminType;
 use App\Form\RegisterType;
 use App\Repository\AccessPointRepository;
@@ -15,6 +16,7 @@ use App\Repository\HighwayRepository;
 use App\Repository\HighwayVehicleRepository;
 use App\Repository\UserRepository;
 use App\Repository\VehicleClassRepository;
+use App\Repository\ViolationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -75,6 +77,42 @@ class MainController extends AbstractController
             'pendingVehicles' => $pendingVehicles,
             'accessPoints' => $accessPoints,
             'users'=>$users,
+            'id' => $request->get('id')
+        ]);
+
+
+    }
+
+    /**
+     * @Route("/viewViolations/{id}", name="viewViolations")
+     * @param Request $request
+     * @param ViolationRepository $violationRepository
+     * @param HighwayExtensionRepository $highwayExtensionRepository
+     * @param HighwayRepository $highwayRepository
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function viewViolations(Request $request,ViolationRepository $violationRepository,HighwayExtensionRepository $highwayExtensionRepository,HighwayRepository $highwayRepository)
+    {
+
+        $remove = $request->get('remove');
+        if( $remove !=''){
+            $em = $this->getDoctrine()->getManager();
+            $violation = $em->getRepository(Violation::class)->find($remove);
+            $em->remove($violation);
+            $em->flush();
+        }
+        $interchanges = $highwayExtensionRepository->findAll();
+        $highways = $highwayRepository->findAll();
+        $violations = $violationRepository->findAllErrorAssigned();
+
+        return $this->render('main/viewViolations.html.twig', [
+            'controller_name' => 'MainController',
+            'interchanges'=> $interchanges,
+            'highways'=>$highways,
+            'hw'=>$request->get('hw'),
+            'hwi'=>$request->get('hwi'),
+            'remove'=>$request->get('remove'),
+            'violations' => $violations,
             'id' => $request->get('id')
         ]);
 
