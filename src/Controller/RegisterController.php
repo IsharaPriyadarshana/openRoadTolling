@@ -106,7 +106,7 @@ class RegisterController extends AbstractController
 
             if(($account['accountNo'] !="")&&($account['ownerName']!="")){
                 $sql = '
-                        INSERT INTO account(account_no,owner_name,user_id)VALUES(:accountNo,:ownerName,:userId)';
+                        INSERT INTO account(account_no,owner_name,user_id,balance)VALUES(:accountNo,:ownerName,:userId,\'0\')';
                 $stmt = $conn->prepare($sql);
                 $stmt->execute(['accountNo' => $account['accountNo'],
                     'ownerName' => $account['ownerName'] ,
