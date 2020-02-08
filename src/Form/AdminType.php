@@ -23,6 +23,7 @@ class AdminType extends AbstractType
             ->add('apNames',TextType::class,['label'=>'AP Names','required' => false,  'attr'=>['placeholder'=>"AP Names (Separated by Commas)"]])
             ->add('accessKey',TextType::class,['label'=>'Access Key','required' => false,  'attr'=>['placeholder'=>"Access Key"]])
             ->add('macAddress',TextType::class,['label'=>'MAC Address','required' => false,  'attr'=>['placeholder'=>"MAC Addresses (Separated by Commas)"]])
+            ->add('gpsTag',TextType::class,['label'=>'GPS Tag','required' => false,  'attr'=>['placeholder'=>"GPS Tags (Separated by Strokes '|')"]])
             ->add('save',SubmitType::class,[
                 'label'=>'Save Changes',
                 'attr' => [

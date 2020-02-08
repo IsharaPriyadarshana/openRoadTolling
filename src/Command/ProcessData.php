@@ -138,6 +138,7 @@ class ProcessData extends Command
                     $toll = $api->calculateToll($pendingTransaction);
                     $pendingTransaction->setToll($toll);
                     $user->setPendingTransaction(1);
+                    $user->setRevisionNo($user->getRevisionNo()+1);
                     $vehicles[$i]->setViolationType(3);
                     $vehicles[$i]->setToll($toll);
                     $pendingTransaction->setUser(null);

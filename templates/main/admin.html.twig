@@ -189,6 +189,17 @@
                     <div class="col-lg-4">
                     </div>
                     <div class="col-lg-4">
+                        {{ form_errors(form.gpsTag) }}
+                        {{ form_widget(form.gpsTag) }}
+                    </div>
+                </div>
+                <div style="margin-top: 0.5cm;"></div>
+                <div class="row">
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
+                    </div>
+                    <div class="col-lg-4">
                         <button type="button" id="addHighwayExtension" class="btn btn-primary">Add</button>
                     </div>
                 </div>
@@ -337,12 +348,13 @@
         const macAddress = document.getElementById('admin_macAddress');
         const apNames = document.getElementById('admin_apNames');
         const accessKey = document.getElementById('admin_accessKey');
+        const gpsTag = document.getElementById('admin_gpsTag');
         const removeHighwayExtensionButton = document.getElementById('removeHighwayExtension');
         addHighwayExtensionButton.addEventListener("click", function () {
             var selectedHighway = document.getElementById("highways["+(addedHighways.selectedIndex+1)+"]").value;
             selectedHighway = selectedHighway.split("        |        ")[1];
             var opt = document.createElement('option');
-            opt.value = highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value  + "        |        " + apNames.value  + "        |        " + accessKey.value;
+            opt.value = highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value  + "        |        " + apNames.value  + "        |        " + accessKey.value  + "        |        " + gpsTag.value;
             opt.innerHTML = highwayExtensionName.value + "        |        " + sequenceNo.value;
             var existingOptions = addedHighwayExtensions.options;
             var isExist = false;
@@ -364,7 +376,7 @@
                 input.setAttribute("name", "highwayExtensions["+ highwayExtensionCodeName.value +"]");
                 input.setAttribute("id", "highwayExtensions["+ highwayExtensionCodeName.value +"]");
 
-                input.setAttribute("value", highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value + "        |        " + apNames.value+ "        |        " + accessKey.value );
+                input.setAttribute("value", highwayExtensionName.value + "        |        " + highwayExtensionCodeName.value + "        |        " + selectedHighway + "        |        " + sequenceNo.value + "        |        " + macAddress.value + "        |        " + apNames.value+ "        |        " + accessKey.value + "        |        " + gpsTag.value );
                 addedHighwayExtensions.appendChild(input);
             }
             highwayExtensionName.value="";
@@ -373,6 +385,7 @@
             macAddress.value="";
             apNames.value="";
             accessKey.value="";
+            gpsTag.value="";
 
         });
         removeHighwayExtensionButton.addEventListener("click",function () {

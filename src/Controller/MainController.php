@@ -175,9 +175,13 @@ class MainController extends AbstractController
                 $alreadyInHighwayExtensions = $this->getHighwayExtensions();
                 foreach ($registeredHighwayExtensions as $registeredHighwayExtension){
                     $highwayExtension = explode("        |        ",$registeredHighwayExtension);
-                   if(sizeof($highwayExtension)==7){
+
+                   if(sizeof($highwayExtension)==8){
+
                        $macAddresses = explode(",",$highwayExtension[4]);
                        $apNames = explode(",",$highwayExtension[5]);
+                       $gpsTags = explode("|",$highwayExtension[7]);
+
                        if(!in_array($highwayExtension[1],$alreadyInHighwayExtensions)){
                            $hway = $this->getDoctrine()->getRepository(Highway::class)->findByCodeName($highwayExtension[2])[0];
                            $exchange = new HighwayExtension();
@@ -193,6 +197,7 @@ class MainController extends AbstractController
                                $ap->setName($apNames[$i]);
                                $ap->setSsid($this->sssidGenerator($highwayExtension[1],$apNames[$i]));
                                $ap->setMacAddress($macAddresses[$i]);
+                               $ap->setGps($gpsTags[$i]);
                                $ap->setHighwayExtension($exchange);
                                $em->persist($ap);
                                $em->flush();

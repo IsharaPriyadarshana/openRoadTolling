@@ -129,6 +129,7 @@
                         <th> Access Point Name</th>
                         <th> Mac Address</th>
                         <th> SSID</th>
+                        <th> GPS Tag</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -140,6 +141,7 @@
                                 <td>{{ accessPoint.name }}</td>
                                 <td>{{ accessPoint.macAddress }}</td>
                                 <td>{{ accessPoint.ssid }}</td>
+                                <td>{{ accessPoint.gps }}</td>
                             </tr>
                         {% endfor %}
                     {% endif %}

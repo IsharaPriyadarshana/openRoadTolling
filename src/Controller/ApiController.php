@@ -684,6 +684,7 @@ class ApiController extends AbstractFOSRestController
         if((float)$user->getAccount()->getBalance() >= (float)$highwayVehicle->getToll()){
             $balance = (float)$user->getAccount()->getBalance() - (float)$highwayVehicle->getToll();
             $user->getAccount()->setBalance((float)($balance));
+            $user->setPendingTransaction(false);
             $transaction = new TransactionHistory();
             $transaction->setUser($user);
             $transaction->setEntrance($highwayVehicle->getEntrance()->getName());
@@ -708,6 +709,7 @@ class ApiController extends AbstractFOSRestController
             return true;
         }else{
             $user->setPendingTransaction(true);
+            $user->setRevisionNo($user->getRevisionNo()+1);
             $em->flush();
             return false;
         }
