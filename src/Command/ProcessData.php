@@ -78,6 +78,12 @@ class ProcessData extends Command
 
         // The vehicles that are left neither entered nor exited properly but are registered on the system
         foreach ($vehicles as $vehicle){
+            /**
+             * @var Vehicle $veh
+             */
+            $veh  = $this->em->getRepository(Vehicle::class)->findByVehicleNo($vehicle->getVehicleNo())[0];
+            $user = $veh->getUser()[0];
+            $vehicle->setUser($user);
             $vehicle->setViolationType(4);
             $this->em->flush();
         }
@@ -144,6 +150,7 @@ class ProcessData extends Command
                     $user->setRevisionNo($user->getRevisionNo()+1);
                     $vehicles[$i]->setViolationType(3);
                     $vehicles[$i]->setToll($toll);
+                    $vehicles[$i]->setUser($user);
                     $pendingTransaction->setUser(null);
                     $this->em->flush();
                     unset($vehicles[$i]);

@@ -674,7 +674,7 @@ class ApiController extends AbstractFOSRestController
 
     public function deductToll(HighwayVehicle $highwayVehicle){
        $em = $this->getDoctrine()->getManager();
-       $conn = $this->getDoctrine()->getManager()->getConnection();
+        $conn = $this->getDoctrine()->getManager()->getConnection();
         /**
          * @var User $user
          */

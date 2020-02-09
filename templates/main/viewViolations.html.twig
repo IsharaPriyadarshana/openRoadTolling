@@ -70,16 +70,26 @@
                                                             <font color="#8a2be2">Violation Type: </font>
                                                             {%if violation.violationType == '1'  %}
                                                                 Unregistered Vehicle
-                                                            {% elseif violation.violationType == '2'  %}
-                                                                Pending Transaction
-                                                            {% elseif violation.violationType == '3'  %}
-                                                                Incorrectly Exited
-                                                            {% elseif violation.violationType == '4'  %}
-                                                                Incorrectly Entered and Exited
-                                                            {% endif %}
+                                                                <a href="{{ path('viewViolations',{'id' : '1', 'remove': violation.id~"#1", 'hw': highway.id, 'hwi': interchange.id})  }}" class="btn btn-primary btn-sm" style="float: right;" id="{{violation.id~violation.vehicleNo}}">Remove</a>
                                                                 <br>
+                                                            {% elseif violation.violationType == '2'  %}
+                                                                Pending Transaction <br>
+                                                                <font color="#8a2be2">Balance: </font>  {{ violation.user.account.balance }}
+                                                                <a href="{{ path('viewViolations',{'id' : '1', 'remove': violation.id~"#2", 'hw': highway.id, 'hwi': interchange.id})  }}" class="btn btn-primary btn-sm" style="float: right;" id="{{violation.id~violation.vehicleNo}}">Pay</a>
+                                                                <br>
+                                                            {% elseif violation.violationType == '3'  %}
+                                                                Incorrectly Exited<br>
+                                                                <font color="#8a2be2">Balance: </font>  {{ violation.user.account.balance }}
+                                                                <a href="{{ path('viewViolations',{'id' : '1', 'remove': violation.id~"#3", 'hw': highway.id, 'hwi': interchange.id})  }}" class="btn btn-primary btn-sm" style="float: right;" id="{{violation.id~violation.vehicleNo}}">Deduct</a>
+                                                                <br>
+                                                            {% elseif violation.violationType == '4'  %}
+                                                                Incorrectly Entered and Exited<br>
+                                                                <font color="#8a2be2">Balance: </font>  {{ violation.user.account.balance }}
+                                                                <a href="{{ path('viewViolations',{'id' : '1', 'remove': violation.id~"#4", 'hw': highway.id, 'hwi': interchange.id})  }}" class="btn btn-primary btn-sm" style="float: right;" id="{{violation.id~violation.vehicleNo}}">Penalty</a>
+                                                                <br>
+                                                            {% endif %}
 
-                                                            <a href="{{ path('viewViolations',{'id' : '1', 'remove': violation.id, 'hw': highway.id, 'hwi': interchange.id})  }}" class="btn btn-primary btn-sm" style="float: right;" id="{{violation.id~violation.vehicleNo}}">Remove</a>
+
                                                             <div style="margin-top: 0.5cm;"></div>
                                                         </p>
                                                         {% endfor %}

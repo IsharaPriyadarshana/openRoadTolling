@@ -5,7 +5,10 @@ namespace App\Controller;
 use App\Entity\AccessPoint;
 use App\Entity\Highway;
 use App\Entity\HighwayExtension;
+use App\Entity\HighwayVehicle;
+use App\Entity\TransactionHistory;
 use App\Entity\User;
+use App\Entity\Vehicle;
 use App\Entity\VehicleClass;
 use App\Entity\Violation;
 use App\Form\AdminType;
@@ -16,12 +19,15 @@ use App\Repository\HighwayRepository;
 use App\Repository\HighwayVehicleRepository;
 use App\Repository\UserRepository;
 use App\Repository\VehicleClassRepository;
+use App\Repository\VehicleRepository;
 use App\Repository\ViolationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use \DateTime;
+use \DateTimeZone;
 
 class MainController extends AbstractController
 {
@@ -89,17 +95,54 @@ class MainController extends AbstractController
      * @param ViolationRepository $violationRepository
      * @param HighwayExtensionRepository $highwayExtensionRepository
      * @param HighwayRepository $highwayRepository
+     * @param HighwayVehicleRepository $highwayVehicleRepository
+     * @param VehicleRepository $vehicleRepository
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function viewViolations(Request $request,ViolationRepository $violationRepository,HighwayExtensionRepository $highwayExtensionRepository,HighwayRepository $highwayRepository)
+    public function viewViolations(Request $request,ViolationRepository $violationRepository,HighwayExtensionRepository $highwayExtensionRepository,HighwayRepository $highwayRepository, HighwayVehicleRepository $highwayVehicleRepository, VehicleRepository $vehicleRepository)
     {
 
         $remove = $request->get('remove');
+
+
         if( $remove !=''){
-            $em = $this->getDoctrine()->getManager();
-            $violation = $em->getRepository(Violation::class)->find($remove);
-            $em->remove($violation);
-            $em->flush();
+            $remove = explode('#',$remove);
+            /**
+             * @var Vehicle $vehicle
+             */
+            $violation = $violationRepository->find($remove[0]);
+
+
+            if ($remove[1]=='1'){
+                $this->deleteViolation($remove[0]);
+            }elseif ($remove[1]=='4'){
+                $vehicle = $vehicleRepository->findByVehicleNo($violation->getVehicleNo())[0];
+                $em = $this->getDoctrine()->getManager();
+                $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
+                $time = $dateNow->format('Y-m-d H:i:s');
+                $maxDis = $highwayExtensionRepository->findMaxDis($violation->getInterchange()->getHighway())[0];
+                $highwayVehicle = new HighwayVehicle();
+                $highwayVehicle->setVehicle($vehicle);
+                $highwayVehicle->setEntrance($maxDis);
+                $highwayVehicle->setEgress($maxDis);
+                $highwayVehicle->setEnterTime(DateTime::createFromFormat('Y-m-d H:i:s',$time));
+                $highwayVehicle->setExitTime(DateTime::createFromFormat('Y-m-d H:i:s',$time));
+                $toll = $maxDis->getSequenceNo()*$vehicle->getClass()->getToll();
+                $highwayVehicle->setToll($toll);
+                $highwayVehicle->setIsCurrentlyIn(0);
+                $highwayVehicle->setDrivedBy($violation->getUser()->getId());
+                $result = $this->deductToll($highwayVehicle);
+                if($result){$this->deleteViolation($remove[0]);}
+
+            }else{
+                $vehicle = $vehicleRepository->findByVehicleNo($violation->getVehicleNo())[0];
+                $hwv = $highwayVehicleRepository->findByVehicle($vehicle)[0];
+                $result = $this->deductToll($hwv);
+                if($result){$this->deleteViolation($remove[0]);}
+            }
+
+
+
         }
         $interchanges = $highwayExtensionRepository->findAll();
         $highways = $highwayRepository->findAll();
@@ -378,6 +421,57 @@ class MainController extends AbstractController
         }
         $prefix = "ORT@#HW";
         return $prefix.$extensionCodeName.$ssid.'_'.$accessPointName;
+
+    }
+
+    public  function deleteViolation($id){
+        $em = $this->getDoctrine()->getManager();
+        $violation = $em->getRepository(Violation::class)->find($id);
+        $em->remove($violation);
+        $em->flush();
+    }
+
+    public function deductToll(HighwayVehicle $highwayVehicle){
+        $em = $this->getDoctrine()->getManager();
+        $conn = $this->getDoctrine()->getManager()->getConnection();
+        /**
+         * @var User $user
+         */
+        $user = $highwayVehicle->getDrivedBy();
+        $user = $this->getDoctrine()->getRepository(User::class)->find($user);
+
+        if((float)$user->getAccount()->getBalance() >= (float)$highwayVehicle->getToll()){
+            $balance = (float)$user->getAccount()->getBalance() - (float)$highwayVehicle->getToll();
+            $user->getAccount()->setBalance((float)($balance));
+            $user->setPendingTransaction(false);
+            $transaction = new TransactionHistory();
+            $transaction->setUser($user);
+            $transaction->setEntrance($highwayVehicle->getEntrance()->getName());
+            $transaction->setEgress($highwayVehicle->getEgress()->getName());
+            $datetime1 = $highwayVehicle->getEnterTime();
+            $datetime2 = $highwayVehicle->getExitTime();
+            $interval = date_diff($datetime2, $datetime1);
+            $hrs = $interval->format('%h') + ($interval->days * 24) + ($interval->format('%i') / 60);
+            $transaction->setDuration(round($hrs,2)." hours");
+            $transaction->setVehicleNo($highwayVehicle->getVehicle()->getVehicleNo());
+            $transaction->setToll($highwayVehicle->getToll());
+            date_default_timezone_set('Asia/Colombo');
+            $transaction->setDate($highwayVehicle->getExitTime());
+            $em->persist($transaction);
+            $em->flush();
+
+            $sql = 'DELETE FROM highway_vehicle WHERE id=:id;';
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([
+                'id'=> $highwayVehicle->getId()]);
+
+            return true;
+        }else{
+            $user->setPendingTransaction(true);
+            $user->setRevisionNo($user->getRevisionNo()+1);
+            $em->flush();
+            return false;
+        }
 
     }
 

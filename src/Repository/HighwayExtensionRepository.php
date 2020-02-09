@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\HighwayExtension;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use phpDocumentor\Reflection\Types\Integer;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
 /**
@@ -47,4 +48,22 @@ class HighwayExtensionRepository extends ServiceEntityRepository
         ;
     }
     */
+
+     /**
+      * @return HighwayExtension[] Returns an array of HighwayExtension objects
+      */
+
+    public function findMaxDis($highway)
+    {
+        return $this->createQueryBuilder('h')
+            ->andWhere('h.highway = :highway')
+            ->setParameter('highway', $highway)
+            ->orderBy('h.sequenceNo', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
 }
