@@ -264,7 +264,7 @@ class MainController extends AbstractController
                            for($i=0;$i<sizeof($macAddresses);$i++){
                                $ap = new AccessPoint();
                                $ap->setName($apNames[$i]);
-                               $ap->setSsid($this->sssidGenerator($highwayExtension[1],$apNames[$i]));
+                               $ap->setSsid(serialize(array($this->sssidGenerator($highwayExtension[1],$apNames[$i]))));
                                $ap->setMacAddress($macAddresses[$i]);
                                $ap->setGps($gpsTags[$i]);
                                $ap->setHighwayExtension($exchange);

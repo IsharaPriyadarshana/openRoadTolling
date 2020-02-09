@@ -123,60 +123,67 @@ class ApiController extends AbstractFOSRestController
         if (count($user)){
             $user = $user[0];
             if($passwordEncoder->isPasswordValid($user,$request->get('password'))){
-                $em = $this->getDoctrine()->getManager();
-                $conn =$em->getConnection();
                 $macAddress = $request->get('macAddress');
-                $timeStamp = DateTime::createFromFormat('Y-m-d H:i:s',$this->convertTime($request->get('time')));
-                $vehicleNo = $request->get('vehicleNo');
-                $vehicle = $vehicleRepository->findByVehicleNo($vehicleNo)[0];
-                $isIn = $highwayVehicleRepository->findByVehicle($vehicle);
-                if(sizeof($isIn)==0){
-                    $highwayVehicle = new HighwayVehicle();
-                    $highwayVehicle->setUser($user);
-                    $highwayVehicle->setVehicle($vehicle);
-                    $highwayVehicle->setEntrance($this->getExtension($macAddress));
-                    $highwayVehicle->setEnterTime($timeStamp);
-                    $highwayVehicle->setIsCurrentlyIn(1);
-                    $em->persist($highwayVehicle);
-                    $em->flush();
-                    $message = json_encode(["entrance" =>$this->getExtension($macAddress)->getName()]);
-                }else{
-                    /**
-                     * @var HighwayVehicle $isIn
-                     */
-                    $vehicleIn = false;
-                    foreach ($isIn as $hwv){
-                        if($hwv->getIsCurrentlyIn() == '1'){
-                            $vehicleIn = true;
-                            break;
-                        }
-                    }
-                    if(!$vehicleIn){
-                        $highwayVehicle = new HighwayVehicle();
-                        $highwayVehicle->setUser($user);
-                        $highwayVehicle->setVehicle($vehicle);
-                        $highwayVehicle->setEntrance($this->getExtension($macAddress));
-                        $highwayVehicle->setEnterTime($timeStamp);
-                        $highwayVehicle->setIsCurrentlyIn(1);
-                        $em->persist($highwayVehicle);
-                        $em->flush();
-                        $message = json_encode(["entrance" =>$this->getExtension($macAddress)->getName()]);
-                    }else{
-                        $highwayVehicle = $highwayVehicleRepository->findByUser($user)[0];
-                        $highwayVehicle->setEgress($this->getExtension($macAddress));
-                        $highwayVehicle->setExitTime($timeStamp);
-                        $highwayVehicle->setDrivedBy($user->getId());
-                        $highwayVehicle->setIsCurrentlyIn(0);
-                        $highwayVehicle->setUser(null);
-                        $highwayVehicle->setToll($this->calculateToll($highwayVehicle));
-                        $em->flush();
-                        $message = json_encode(["exit"=>$this->getExtension($macAddress)->getName(),"toll"=>sprintf("%.3f", $highwayVehicle->getToll()) ]);
-                        $this->deductToll($highwayVehicle);
-                    }
-                }
+                $gps = $request->get('gps');
+                $ssid = $request->get('ssid');
+              if($this->verifyInterchange($macAddress,$ssid,$gps)){
+                  $em = $this->getDoctrine()->getManager();
+                  $conn =$em->getConnection();
+                  $timeStamp = DateTime::createFromFormat('Y-m-d H:i:s',$this->convertTime($request->get('time')));
+                  $vehicleNo = $request->get('vehicleNo');
+                  $vehicle = $vehicleRepository->findByVehicleNo($vehicleNo)[0];
+                  $isIn = $highwayVehicleRepository->findByVehicle($vehicle);
+                  if(sizeof($isIn)==0){
+                      $highwayVehicle = new HighwayVehicle();
+                      $highwayVehicle->setUser($user);
+                      $highwayVehicle->setVehicle($vehicle);
+                      $highwayVehicle->setEntrance($this->getExtension($macAddress));
+                      $highwayVehicle->setEnterTime($timeStamp);
+                      $highwayVehicle->setIsCurrentlyIn(1);
+                      $em->persist($highwayVehicle);
+                      $em->flush();
+                      $message = json_encode(["entrance" =>$this->getExtension($macAddress)->getName()]);
+                  }else{
+                      /**
+                       * @var HighwayVehicle $isIn
+                       */
+                      $vehicleIn = false;
+                      foreach ($isIn as $hwv){
+                          if($hwv->getIsCurrentlyIn() == '1'){
+                              $vehicleIn = true;
+                              break;
+                          }
+                      }
+                      if(!$vehicleIn){
+                          $highwayVehicle = new HighwayVehicle();
+                          $highwayVehicle->setUser($user);
+                          $highwayVehicle->setVehicle($vehicle);
+                          $highwayVehicle->setEntrance($this->getExtension($macAddress));
+                          $highwayVehicle->setEnterTime($timeStamp);
+                          $highwayVehicle->setIsCurrentlyIn(1);
+                          $em->persist($highwayVehicle);
+                          $em->flush();
+                          $message = json_encode(["entrance" =>$this->getExtension($macAddress)->getName()]);
+                      }else{
+                          $highwayVehicle = $highwayVehicleRepository->findByUser($user)[0];
+                          $highwayVehicle->setEgress($this->getExtension($macAddress));
+                          $highwayVehicle->setExitTime($timeStamp);
+                          $highwayVehicle->setDrivedBy($user->getId());
+                          $highwayVehicle->setIsCurrentlyIn(0);
+                          $highwayVehicle->setUser(null);
+                          $highwayVehicle->setToll($this->calculateToll($highwayVehicle));
+                          $em->flush();
+                          $message = json_encode(["exit"=>$this->getExtension($macAddress)->getName(),"toll"=>sprintf("%.3f", $highwayVehicle->getToll()) ]);
+                          $this->deductToll($highwayVehicle);
+                      }
+                  }
 
 
-                return new RES($message,RES::HTTP_OK);
+                  return new RES($message,RES::HTTP_OK);
+              }else{
+                  $message = "Invalid Interchange!";
+                  return new RES($message,RES::HTTP_FORBIDDEN);
+              }
 
             } else {
                 $message = "Invalid Credentials!";
@@ -366,7 +373,12 @@ class ApiController extends AbstractFOSRestController
         /**
          * @var AccessPoint $accessPoint
          */
-        $accessPoint = $accessPointRepository->findByName($request->get('name'))[0];
+        $accessPoints = $extension->getAccessPoint();
+        foreach ($accessPoints as $ap){
+            if($request->get('name') == $ap->getName()){
+                $accessPoint = $ap;
+            }
+        }
 
         if ($extension->getAccessKey() == $request->get('accessKey')){
             $ssids = unserialize($accessPoint->getSsid());
@@ -764,6 +776,62 @@ class ApiController extends AbstractFOSRestController
         $year = $date[2];
 
         return $year."-".$month."-".$day." ".$time;
+    }
+
+//if( strtolower($accessPoint->getMacAddress()) == strtolower($macAddress) ){
+//return $extension;
+//}
+
+    public function verifyInterchange($macAddress, $ssidReceived,$gpsReceived){
+
+        $gpsReceived = explode(',',$gpsReceived);
+        $accessPoints = $this->getDoctrine()->getRepository(AccessPoint::class)->findAll();
+
+        $ap = "";
+        foreach ($accessPoints as $accessPoint){
+            if( strtolower($accessPoint->getMacAddress()) == strtolower($macAddress) ){
+                /**
+                 * @var AccessPoint $ap
+                 */
+                $ap = $accessPoint;
+                break;
+            }
+        }
+
+
+        if($ap != ""){
+            $ssids = unserialize($ap->getSsid());
+            foreach ($ssids as $ssid){
+                if($ssid == $ssidReceived){
+                    $gps = explode(',',$ap->getGps());
+                    $distance = $this->distance($gps[0],$gps[1],$gpsReceived[0],$gpsReceived[1]);
+                    if($distance < 0.5){
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            return false;
+        }else{
+            return false;
+        }
+    }
+
+
+    function distance($lat1, $lon1, $lat2, $lon2) {
+        if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+            return 0;
+        }
+        else {
+            $theta = $lon1 - $lon2;
+            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+            $dist = acos($dist);
+            $dist = rad2deg($dist);
+            $miles = $dist * 60 * 1.1515;
+
+                return ($miles * 1.609344);
+
+        }
     }
 
 }
