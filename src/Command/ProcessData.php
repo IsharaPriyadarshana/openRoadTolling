@@ -4,6 +4,7 @@
 
 namespace App\Command;
 use App\Controller\ApiController;
+use App\Entity\HighwayExtension;
 use App\Entity\HighwayVehicle;
 use App\Entity\TransactionHistory;
 use App\Entity\User;
@@ -84,7 +85,24 @@ class ProcessData extends Command
             $veh  = $this->em->getRepository(Vehicle::class)->findByVehicleNo($vehicle->getVehicleNo())[0];
             $user = $veh->getUser()[0];
             $vehicle->setUser($user);
+            $maxDis = $this->em->getRepository(HighwayExtension::class)->findMaxDis($vehicle->getInterchange()->getHighway())[0];
+            $toll = $maxDis->getSequenceNo()*$veh->getClass()->getToll();
+            $vehicle->setToll($toll);
             $vehicle->setViolationType(4);
+            $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
+            $time = $dateNow->format('Y-m-d H:i:s');
+            $highwayVehicle = new HighwayVehicle();
+            $highwayVehicle->setVehicle($veh);
+            $highwayVehicle->setEntrance($vehicle->getInterchange());
+            $highwayVehicle->setEgress($vehicle->getInterchange());
+            $highwayVehicle->setEnterTime(DateTime::createFromFormat('Y-m-d H:i:s',$time));
+            $highwayVehicle->setExitTime(DateTime::createFromFormat('Y-m-d H:i:s',$time));
+            $highwayVehicle->setToll($vehicle->getToll());
+            $highwayVehicle->setIsCurrentlyIn(0);
+            $highwayVehicle->setDrivedBy($user->getId());
+            $user->setPendingTransaction(1);
+            $user->setRevisionNo($user->getRevisionNo()+1);
+            $this->em->persist($highwayVehicle);
             $this->em->flush();
         }
     }

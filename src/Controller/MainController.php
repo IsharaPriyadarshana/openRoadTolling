@@ -118,19 +118,7 @@ class MainController extends AbstractController
             }elseif ($remove[1]=='4'){
                 $vehicle = $vehicleRepository->findByVehicleNo($violation->getVehicleNo())[0];
                 $em = $this->getDoctrine()->getManager();
-                $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
-                $time = $dateNow->format('Y-m-d H:i:s');
-                $maxDis = $highwayExtensionRepository->findMaxDis($violation->getInterchange()->getHighway())[0];
-                $highwayVehicle = new HighwayVehicle();
-                $highwayVehicle->setVehicle($vehicle);
-                $highwayVehicle->setEntrance($maxDis);
-                $highwayVehicle->setEgress($maxDis);
-                $highwayVehicle->setEnterTime(DateTime::createFromFormat('Y-m-d H:i:s',$time));
-                $highwayVehicle->setExitTime(DateTime::createFromFormat('Y-m-d H:i:s',$time));
-                $toll = $maxDis->getSequenceNo()*$vehicle->getClass()->getToll();
-                $highwayVehicle->setToll($toll);
-                $highwayVehicle->setIsCurrentlyIn(0);
-                $highwayVehicle->setDrivedBy($violation->getUser()->getId());
+                $highwayVehicle = $highwayVehicleRepository->findByVehicle($vehicle)[0];
                 $result = $this->deductToll($highwayVehicle);
                 if($result){$this->deleteViolation($remove[0]);}
 
