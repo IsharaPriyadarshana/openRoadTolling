@@ -17,203 +17,266 @@
 
     {{ form_start(form) }}
 
+
+    <div style="margin-top: 1cm;"></div>
+
     <div class="container">
 
-        <div class="row">
-            <div class="col-lg-4">
-                <div style="margin-top: 0.5cm;"></div>
-                <h3>Vehicle Classes</h3>
-                <select multiple class="form-control" id="registeredVehicleClasses" name="vehicleClasses[]">
-                    {% if( vehicleClasses|length >0) %}
-                        {% set i=1 %}
-                        {% for vehicleClass in vehicleClasses %}
-                            <option>{{ vehicleClass.className }}        |        {{ vehicleClass.toll }}</option>
-                            <script>
-                                var input = document.createElement("input");
-                                input.setAttribute("type", "hidden");
+                <div class="row">
+                    <div class="col-4">
+                        <div class="list-group" id="list-tab" role="tablist">
+                                <a class="list-group-item list-group-item-action" id="vehicleClasses" data-toggle="list" href="#vehicleClassLink" role="tab" aria-controls="vehicleClassLink">Vehicle Classes</a>
+                                <a class="list-group-item list-group-item-action" id="highways" data-toggle="list" href="#highwayLink" role="tab" aria-controls="highwayLink">Highways</a>
+                                <a class="list-group-item list-group-item-action" id="highwayInterchanges" data-toggle="list" href="#highwayInterchangeLink" role="tab" aria-controls="highwayInterchangeLink" >Highway Interchanges</a>
 
-                                input.setAttribute("name", "vehicleClasses["+"{{ i }}" +"]");
-                                input.setAttribute("id", "vehicleClasses["+"{{ i }}" +"]");
+                        </div>
+                        <div style="margin-top: 0.5cm;"></div>
+                        <div class="row">
+                            <div class="col-lg-3"></div>
+                            <div class="col-lg-6">{{ form_widget(form.save) }}</div>
+                            <div class="col-lg-3"></div>
+                        </div>
+                    </div>
+                    <div class="col-8">
+                        <div class="tab-content" id="nav-tabContent">
 
-                                input.setAttribute("value", "{{ vehicleClass.className  }}" + "        |        " + "{{ vehicleClass.toll }}");
-                                document.getElementById('registeredVehicleClasses').appendChild(input);
-                            </script>
-                            {%  set i = i+1 %}
-                        {% endfor %}
-                    {% endif %}
-                </select>
+                                <div class="tab-pane fade show" id="vehicleClassLink" role="tabpanel" aria-labelledby="vehicleClasses">
+                                    <div class="overflow-y" style="width: auto; height: auto;" >
+                                        <font color="#8a2be2"><h4>Vehicle Classes</h4></font>
+                                        <div class="row">
+                                        <div class="col-lg-6">
+                                        <select multiple class="form-control" id="registeredVehicleClasses" name="vehicleClasses[]">
+                                            {% if( vehicleClasses|length >0) %}
+                                                {% set i=1 %}
+                                                {% for vehicleClass in vehicleClasses %}
+                                                    <option>{{ vehicleClass.className }}        |        {{ vehicleClass.toll }}</option>
+                                                    <script>
+                                                        var input = document.createElement("input");
+                                                        input.setAttribute("type", "hidden");
+
+                                                        input.setAttribute("name", "vehicleClasses["+"{{ i }}" +"]");
+                                                        input.setAttribute("id", "vehicleClasses["+"{{ i }}" +"]");
+
+                                                        input.setAttribute("value", "{{ vehicleClass.className  }}" + "        |        " + "{{ vehicleClass.toll }}");
+                                                        document.getElementById('registeredVehicleClasses').appendChild(input);
+                                                    </script>
+                                                    {%  set i = i+1 %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                            <div style="margin-top: 0.5cm;"></div>
+                                        </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-lg-6" style="float: right;">
+                                                <button type="button" id="removeVehicleClass" class="btn btn-primary" style="float: right;">Remove</button>
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 0.5cm;"></div>
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                {{ form_errors(form.className) }}
+                                                {{ form_widget(form.className) }}
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 0.5cm;"></div>
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                {{ form_errors(form.toll) }}
+                                                {{ form_widget(form.toll) }}
+                                            </div>
+                                        </div>
+                                        <div style="margin-top: 0.5cm;"></div>
+                                        <div class="row">
+                                        <div class="col-lg-4">
+                                         <button type="button" id="addVehicleClass" class="btn btn-primary" style="float: right;">Add</button>
+                                         </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+
+
+                            <div class="tab-pane fade show" id="highwayLink" role="tabpanel" aria-labelledby="highways">
+                                <div class="overflow-y" style="width: auto; height: auto;   " >
+                                    <font color="#8a2be2"><h4>Highways</h4></font>
+                                    <div class="row">
+                                        <div class="col-lg-8">
+                                                <select multiple class="form-control" id="registeredHighways" name="highways[]">
+                                                    {% if( highways|length >0) %}
+                                                        {% set i=1 %}
+                                                        {% for highway in highways %}
+                                                            <option>{{ highway.name }}        |        {{ highway.codeName }}</option>
+                                                            <script>
+                                                                var input = document.createElement("input");
+
+                                                                input.setAttribute("type", "hidden");
+
+                                                                input.setAttribute("name", "highways["+"{{ i }}" +"]");
+                                                                input.setAttribute("id", "highways["+"{{ i }}" +"]");
+
+                                                                input.setAttribute("value", "{{ highway.name }}        |        {{ highway.codeName }}");
+                                                                document.getElementById('registeredHighways').appendChild(input);
+                                                            </script>
+                                                            {%  set i = i+1 %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </select>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.5cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-8" style="float: right;">
+                                            <button type="button" id="removeHighway" class="btn btn-primary" style="float: right">Remove</button>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.5cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-8">
+                                            {{ form_errors(form.highwayName) }}
+                                            {{ form_widget(form.highwayName) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.5cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-8">
+                                            {{ form_errors(form.highwayCodeName) }}
+                                            {{ form_widget(form.highwayCodeName) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.5cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-5">
+                                            <button type="button" id="addHighway" class="btn btn-primary" style="float: right">Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+
+
+                            <div class="tab-pane fade show" id="highwayInterchangeLink" role="tabpanel" aria-labelledby="highwayInterchanges">
+                                <div class="overflow-y" style="width: auto; height: auto; ">
+                                    <font color="#8a2be2"><h4>Highway Interchanges</h4></font>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            <select multiple class="form-control" id="registeredHighwaysClone" name="highwaysClone[]"></select>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <select multiple class="form-control" id="registeredHighwayExtensions" name="highwayExtensions[]">
+                                                {% if( highwayExtensions|length >0) %}
+                                                    {% for highwayExtension in highwayExtensions %}
+                                                        <script>
+                                                            var input = document.createElement("input");
+
+                                                            input.setAttribute("type", "hidden");
+
+                                                            input.setAttribute("name", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
+                                                            input.setAttribute("id", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
+
+                                                            input.setAttribute("value", "{{ highwayExtension.name }}        |        {{ highwayExtension.codeName }}        |        {{ highwayExtension.highway.codeName }}        |        {{ highwayExtension.sequenceNo }}");
+                                                            document.getElementById('registeredHighwayExtensions').appendChild(input);
+                                                        </script>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <script>
+                                        const el = document.getElementById('highwayInterchanges');
+                                        const itmClone = document.getElementById("registeredHighwaysClone");
+                                        el.onclick = function() {
+                                            var options = addedHighways.innerHTML;
+                                            itmClone.innerHTML = options;
+                                            itmClone.selectedIndex = addedHighways.selectedIndex;
+                                        };
+                                        itmClone.onclick = function () {
+                                            addedHighways.selectedIndex = itmClone.selectedIndex;
+                                            addedHighways.click();
+                                        }
+                                    </script>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <button type="button" id="removeHighwayExtension" class="btn btn-primary" style="float: right">Remove</button>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            {{ form_errors(form.highwayExtensionName) }}
+                                            {{ form_widget(form.highwayExtensionName) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            {{ form_errors(form.highwayExtensionCodeName) }}
+                                            {{ form_widget(form.highwayExtensionCodeName) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            {{ form_errors(form.sequenceNo) }}
+                                            {{ form_widget(form.sequenceNo) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            {{ form_errors(form.apNames) }}
+                                            {{ form_widget(form.apNames) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            {{ form_errors(form.accessKey) }}
+                                            {{ form_widget(form.accessKey) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            {{ form_errors(form.macAddress) }}
+                                            {{ form_widget(form.macAddress) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-6">
+                                            {{ form_errors(form.gpsTag) }}
+                                            {{ form_widget(form.gpsTag) }}
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 0.2cm;"></div>
+                                    <div class="row">
+                                        <div class="col-lg-4">
+                                            <button type="button" id="addHighwayExtension" class="btn btn-primary" style="float: right">Add</button>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
-            <div class="col-lg-4">
-                <div style="margin-top: 0.5cm;"></div>
-                <h3>Highways</h3>
-                <select multiple class="form-control" id="registeredHighways" name="highways[]">
-                    {% if( highways|length >0) %}
-                        {% set i=1 %}
-                        {% for highway in highways %}
-                            <option>{{ highway.name }}        |        {{ highway.codeName }}</option>
-                            <script>
-                                var input = document.createElement("input");
-
-                                input.setAttribute("type", "hidden");
-
-                                input.setAttribute("name", "highways["+"{{ i }}" +"]");
-                                input.setAttribute("id", "highways["+"{{ i }}" +"]");
-
-                                input.setAttribute("value", "{{ highway.name }}        |        {{ highway.codeName }}");
-                                document.getElementById('registeredHighways').appendChild(input);
-                            </script>
-                            {%  set i = i+1 %}
-                        {% endfor %}
-                    {% endif %}
-                </select>
-            </div>
-            <div class="col-lg-4">
-                <div style="margin-top: 0.5cm;"></div>
-                <h3>Highway Interchanges</h3>
-                <select multiple class="form-control" id="registeredHighwayExtensions" name="highwayExtensions[]">
-                    {% if( highwayExtensions|length >0) %}
-                        {% for highwayExtension in highwayExtensions %}
-                            <script>
-                                var input = document.createElement("input");
-
-                                input.setAttribute("type", "hidden");
-
-                                input.setAttribute("name", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
-                                input.setAttribute("id", "highwayExtensions["+"{{ highwayExtension.codeName }}" +"]");
-
-                                input.setAttribute("value", "{{ highwayExtension.name }}        |        {{ highwayExtension.codeName }}        |        {{ highwayExtension.highway.codeName }}        |        {{ highwayExtension.sequenceNo }}");
-                                document.getElementById('registeredHighwayExtensions').appendChild(input);
-                            </script>
-                        {% endfor %}
-                    {% endif %}
-                </select>
-            </div>
-        </div>
-        <div style="margin-top: 0.2cm;"></div>
-
-        <div class="row">
-            <div class="col-lg-4" style="float: right;">
-                <button type="button" id="removeVehicleClass" class="btn btn-primary">Remove</button>
-            </div>
-            <div class="col-lg-4" style="float: right;">
-                <button type="button" id="removeHighway" class="btn btn-primary">Remove</button>
-            </div>
-            <div class="col-lg-4" style="float: right;">
-                <button type="button" id="removeHighwayExtension" class="btn btn-primary">Remove</button>
-            </div>
-        </div>
-    </div>
 
 
-        <div id="admin">
-            <div class="container">
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        {{ form_errors(form.className) }}
-                        {{ form_widget(form.className) }}
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.highwayName) }}
-                        {{ form_widget(form.highwayName) }}
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.highwayExtensionName) }}
-                        {{ form_widget(form.highwayExtensionName) }}
-                    </div>
-                </div>
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        {{ form_errors(form.toll) }}
-                        {{ form_widget(form.toll) }}
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.highwayCodeName) }}
-                        {{ form_widget(form.highwayCodeName) }}
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.highwayExtensionCodeName) }}
-                        {{ form_widget(form.highwayExtensionCodeName) }}
-                    </div>
-                </div>
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                        <button type="button" id="addVehicleClass" class="btn btn-primary">Add</button>
-                    </div>
-                    <div class="col-lg-4">
-                        <button type="button" id="addHighway" class="btn btn-primary">Add</button>
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.sequenceNo) }}
-                        {{ form_widget(form.sequenceNo) }}
-                    </div>
-                </div>
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.apNames) }}
-                        {{ form_widget(form.apNames) }}
-                    </div>
-                </div>
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.accessKey) }}
-                        {{ form_widget(form.accessKey) }}
-                    </div>
-                </div>
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.macAddress) }}
-                        {{ form_widget(form.macAddress) }}
-                    </div>
-                </div>
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                        {{ form_errors(form.gpsTag) }}
-                        {{ form_widget(form.gpsTag) }}
-                    </div>
-                </div>
-                <div style="margin-top: 0.5cm;"></div>
-                <div class="row">
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                    </div>
-                    <div class="col-lg-4">
-                        <button type="button" id="addHighwayExtension" class="btn btn-primary">Add</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
 
-    <div style="margin-top: 0.5cm;"></div>
-    <div class="row">
-        <div class="col-lg-5"></div>
-        <div class="col-lg-2">{{ form_widget(form.save) }}</div>
-        <div class="col-lg-5"></div>
-    </div>
 
     {{ form_row(form._token) }}
     {{ form_errors(form) }}
