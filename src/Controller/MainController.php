@@ -444,6 +444,7 @@ class MainController extends AbstractController
             $balance = (float)$user->getAccount()->getBalance() - (float)$highwayVehicle->getToll();
             $user->getAccount()->setBalance((float)($balance));
             $user->setPendingTransaction(false);
+            $user->setRevisionNo($user->getRevisionNo()+1);
             $transaction = new TransactionHistory();
             $transaction->setUser($user);
             $transaction->setEntrance($highwayVehicle->getEntrance()->getName());
