@@ -5,6 +5,7 @@ use App\Entity\AccessPoint;
 use App\Entity\Highway;
 use App\Entity\HighwayExtension;
 use App\Entity\HighwayVehicle;
+use App\Entity\Power;
 use App\Entity\Serial;
 use App\Entity\Transaction;
 use App\Entity\TransactionHistory;
@@ -14,6 +15,7 @@ use App\Entity\Violation;
 use App\Repository\AccessPointRepository;
 use App\Repository\HighwayExtensionRepository;
 use App\Repository\HighwayVehicleRepository;
+use App\Repository\PowerRepository;
 use App\Repository\TransactionHistoryRepository;
 use App\Repository\TransactionRepository;
 use App\Repository\UserRepository;
@@ -327,6 +329,7 @@ class ApiController extends AbstractFOSRestController
      * @FOSRest\View()
      * @param Request $request
      * @param HighwayExtensionRepository $highwayExtensionRepository
+     * @param AccessPointRepository $accessPointRepository
      * @return RES
      */
     public function postUpdateSSID(Request $request,  HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository)
@@ -353,6 +356,105 @@ class ApiController extends AbstractFOSRestController
         }
 
     }
+
+
+    /**
+     * Test
+     * @FOSRest\Get("/power_info")
+     * @FOSRest\View()
+     * @param PowerRepository $powerRepository
+     * @return RES
+     */
+    public function getPowerInfo(PowerRepository $powerRepository)
+    {
+
+        $message = json_encode(['power'=>$powerRepository->findAll()]);
+
+
+            return new RES($message,RES::HTTP_OK);
+
+        }
+
+    /**
+     * Test
+     * @FOSRest\Get("/test")
+     * @FOSRest\View()
+     * @return RES
+     */
+    public function testGet()
+    {
+
+        $message = json_encode(['power'=>"power is not availabe"]);
+
+
+        return new RES($message,RES::HTTP_OK);
+
+    }
+
+
+
+
+    /**
+     * Test
+     * @FOSRest\Post("/power")
+     * @FOSRest\View()
+     * @param Request $request
+     * @param HighwayExtensionRepository $highwayExtensionRepository
+     * @param AccessPointRepository $accessPointRepository
+     * @param PowerRepository $powerRepository
+     * @return RES
+     * @throws \Exception
+     */
+    public function postPower(Request $request,  HighwayExtensionRepository $highwayExtensionRepository, AccessPointRepository $accessPointRepository, PowerRepository $powerRepository)
+    {
+        /**
+         * @var HighwayExtension $extension
+         */
+        $extension = $highwayExtensionRepository->findByCodeName($request->get('codeName'))[0];
+
+        $apName = $request->get('name');
+        foreach ($extension->getAccessPoint() as $ap){
+            if($ap->getName() == $apName){
+                $accessPoint = $ap;
+            }
+        }
+
+
+        if ($extension->getAccessKey() == $request->get('accessKey')){
+            $status = $request->get('status');
+            $em = $this->getDoctrine()->getManager();
+            if($status='0'){
+                $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
+                $power = new Power();
+                $power->setInterchange($extension);
+                $power->setAccessPoint($accessPoint);
+                $power->setName($accessPoint->getName());
+                $power->setDate($dateNow->format('Y-m-d H:i:s'));
+                $em->persist($power);
+                $em->flush();
+            }else{
+                $powers = $powerRepository->findByInterchange($extension);
+                foreach ($powers as $pw){
+                    if($pw->getName() == $apName){
+                        $power = $pw;
+                    }
+                    $em->remove($power);
+                    $em->flush();
+                }
+            }
+
+            $message = "OK";
+            return new RES($message,RES::HTTP_OK);
+
+
+        } else {
+            $message = "Invalid AccessKey!";
+            return new RES($message,RES::HTTP_NOT_FOUND);
+
+        }
+
+    }
+
 
 
     /**

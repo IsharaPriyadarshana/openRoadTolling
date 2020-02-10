@@ -40,6 +40,11 @@ class AccessPoint
      */
     private $gps;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Power", mappedBy="accessPoint")
+     */
+    private $power;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -101,6 +106,24 @@ class AccessPoint
     public function setGps(?string $gps): self
     {
         $this->gps = $gps;
+
+        return $this;
+    }
+
+    public function getPower(): ?Power
+    {
+        return $this->power;
+    }
+
+    public function setPower(?Power $power): self
+    {
+        $this->power = $power;
+
+        // set (or unset) the owning side of the relation if necessary
+        $newAccessPoint = $power === null ? null : $this;
+        if ($newAccessPoint !== $power->getAccessPoint()) {
+            $power->setAccessPoint($newAccessPoint);
+        }
 
         return $this;
     }
