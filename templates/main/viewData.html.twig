@@ -102,6 +102,7 @@
                         var responseData;
                         function getData() {
                             powerRequest.open('GET','https://open-road-tolling.herokuapp.com/power_info');
+
                             powerRequest.onload = function () {
                                 if(powerRequest.status >=200 && powerRequest.status < 400){
                                     responseData = powerRequest.responseText;
