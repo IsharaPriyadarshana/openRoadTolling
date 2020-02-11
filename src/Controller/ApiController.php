@@ -375,7 +375,7 @@ class ApiController extends AbstractFOSRestController
 
         foreach ($powers as $power){
             $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
-            $interval = date_diff($dateNow, $power->getDate());
+            $interval = date_diff(DateTime::createFromFormat('Y-m-d H:i:s',$dateNow->format('Y-m-d H:i:s')), $power->getDate());
             $hrs = $interval->format('%h') + ($interval->days * 24);
             $mins = $interval->format('%i');
             $sec = $interval->format('%s');
