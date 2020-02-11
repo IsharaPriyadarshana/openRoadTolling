@@ -360,6 +360,40 @@ class ApiController extends AbstractFOSRestController
     }
 
 
+    /**
+     * Test
+     * @FOSRest\Get("/power_info")
+     * @FOSRest\View()
+     * @param PowerRepository $powerRepository
+     * @return RES
+     */
+    public function getPowerInfo(PowerRepository $powerRepository)
+    {
+
+        $powers = $powerRepository->findAll();
+        $message = array();
+
+        foreach ($powers as $power){
+            $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
+            $interval = date_diff(DateTime::createFromFormat('Y-m-d H:i:s',$dateNow->format('Y-m-d H:i:s')), $power->getDate());
+            $hrs = $interval->format('%h') + ($interval->days * 24);
+            $mins = $interval->format('%i');
+            $sec = $interval->format('%s');
+
+            $pw = array();
+            $pw['highway']= $power->getInterchange()->getHighway()->getName();
+            $pw['interchange']= $power->getInterchange()->getName();
+            $pw['apName'] = $power->getName();
+            $pw['time'] = $hrs.':'.$mins.':'.$sec;
+            $message[] = $pw;
+        }
+
+        $reports = json_encode(["power" =>$message]);
+
+
+            return new RES($reports,RES::HTTP_OK);
+
+        }
 
 
     /**
