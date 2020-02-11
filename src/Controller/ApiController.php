@@ -31,6 +31,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Response as RES;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use \Datetime;
+use \DateTimeZone;
+
 
 /**
  * Brand controller.
@@ -368,30 +370,30 @@ class ApiController extends AbstractFOSRestController
     public function getPowerInfo(PowerRepository $powerRepository)
     {
 
-        $message = json_encode(['power'=>$powerRepository->findAll()]);
+        $powers = $powerRepository->findAll();
+        $message = array();
 
+        foreach ($powers as $power){
+            $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
+            $interval = date_diff($dateNow, $power->getDate());
+            $hrs = $interval->format('%h') + ($interval->days * 24);
+            $mins = $interval->format('%i');
+            $sec = $interval->format('%s');
 
-            return new RES($message,RES::HTTP_OK);
-
+            $pw = array();
+            $pw['highway']= $power->getInterchange()->getHighway()->getName();
+            $pw['interchange']= $power->getInterchange()->getName();
+            $pw['apName'] = $power->getName();
+            $pw['time'] = $hrs.':'.$mins.':'.$sec;
+            $message[] = $pw;
         }
 
-    /**
-     * Test
-     * @FOSRest\Get("/test")
-     * @FOSRest\View()
-     * @return RES
-     */
-    public function testGet()
-    {
-
-        $message = json_encode(['power'=>"power is not availabe"]);
+        $reports = json_encode(["power" =>$message]);
 
 
-        return new RES($message,RES::HTTP_OK);
+            return new RES($reports,RES::HTTP_OK);
 
-    }
-
-
+        }
 
 
     /**
@@ -423,13 +425,13 @@ class ApiController extends AbstractFOSRestController
         if ($extension->getAccessKey() == $request->get('accessKey')){
             $status = $request->get('status');
             $em = $this->getDoctrine()->getManager();
-            if($status='0'){
+            if($status=='0'){
                 $dateNow = new DateTime("now", new DateTimeZone('Asia/Colombo') );
                 $power = new Power();
                 $power->setInterchange($extension);
                 $power->setAccessPoint($accessPoint);
                 $power->setName($accessPoint->getName());
-                $power->setDate($dateNow->format('Y-m-d H:i:s'));
+                $power->setDate(DateTime::createFromFormat('Y-m-d H:i:s',$dateNow->format('Y-m-d H:i:s')));
                 $em->persist($power);
                 $em->flush();
             }else{

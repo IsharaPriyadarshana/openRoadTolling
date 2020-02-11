@@ -10,36 +10,49 @@
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'power'})  }}">Power Information</a>
                       {% elseif id=='highways' %}
                       <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                       <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'power'})  }}">Power Information</a>
                       {% elseif id=='highwayInterchanges' %}
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'power'})  }}">Power Information</a>
                       {% elseif id=='accessPoints' %}
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'power'})  }}">Power Information</a>
                       {% elseif id=='highwayVehicles' %}
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'power'})  }}">Power Information</a>
                       {% elseif id=='pendingVehicles' %}
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
                           <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'power'})  }}">Power Information</a>
+                      {% elseif id=='power' %}
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'vehicleClasses'})  }}">View Vehicle Classes</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highways'})  }}">View Highways</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayInterchanges'})  }}">View Highway Interchanges</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'accessPoints'})  }}">View Access Points</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'highwayVehicles'})  }}">Vehicles Inside Highway</a>
+                          <a class="dropdown-item" href="{{ path('viewData',{'id' : 'pendingVehicles'})  }}">Pending Transactions</a>
                       {% endif %}
                   </div>
               {% endblock %}
@@ -69,6 +82,69 @@
                             {% endfor %}
                         {% endif %}
                      </tbody>
+                </table>
+            {% elseif id=='power' %}
+                <h3>Power Monitoring</h3>
+                <table class="table table-hover" id="powerTable">
+                    <thead>
+                    <tr>
+                        <th>Highway</th>
+                        <th>Interchange</th>
+                        <th>Acccess Point Name</th>
+                        <th>Time on Battery Power</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr></tr>
+                    <script type="text/javascript">
+                        const table = document.getElementById('powerTable');
+                        var powerRequest = new XMLHttpRequest();
+                        var responseData;
+                        function getData() {
+                            powerRequest.open('GET','https://open-road-tolling.herokuapp.com/api/power_info');
+                            powerRequest.onload = function () {
+                                if(powerRequest.status >=200 && powerRequest.status < 400){
+                                    responseData = powerRequest.responseText;
+                                }
+
+
+                            };
+                            powerRequest.onerror = function(){
+
+                            };
+                            powerRequest.send();
+                            responseData = JSON.parse(responseData);
+                            table.innerText = "";
+                            table.innerHTML = "<thead>\n" +
+                                "                    <tr>\n" +
+                                "                        <th>Highway</th>\n" +
+                                "                        <th>Interchange</th>\n" +
+                                "                        <th>Acccess Point Name</th>\n" +
+                                "                        <th>Time on Battery Power</th>\n" +
+                                "                    </tr>\n" +
+                                "                    </thead>\n" +
+                                "                    <tbody>\n" +
+                                "                    <tr></tr>";
+                            for(var i=0; i<responseData.power.length;i++){
+                                var row = table.insertRow();
+                                var cell1 = row.insertCell(0);
+                                var cell2 = row.insertCell(1);
+                                var cell3 = row.insertCell(2);
+                                var cell4 = row.insertCell(3);
+                                cell1.innerHTML = responseData.power[i].highway;
+                                cell2.innerHTML = responseData.power[i].interchange;
+                                cell3.innerHTML = responseData.power[i].apName;
+                                cell4.innerHTML = responseData.power[i].time;
+                            }
+
+
+                        }
+
+                        var interval = setInterval(getData,1000);
+
+
+                    </script>
+                    </tbody>
                 </table>
             {% elseif id=='highways' %}
                 <h3>Highways</h3>

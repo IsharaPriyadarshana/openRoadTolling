@@ -11,30 +11,6 @@
             <div class="header-content-inner">
                 <h1>Open Road Tolling</h1>
                 <p>Drive Freely on Your Way, Pay at Your Fingertips</p>
-                <h2 id="ishara">Ishara</h2>
-                <button id="btnTest">Click Me</button>
-                <script type="text/javascript">
-                    var ourRequest = new XMLHttpRequest();
-
-                    ourRequest.open('GET','https://open-road-tolling.herokuapp.com/api/test');
-                    var responseData;
-                    ourRequest.onload = function () {
-                        if(ourRequest.status >=200 && ourRequest.status < 400){
-                            responseData = ourRequest.responseText;
-                        }
-
-
-                    };
-                    ourRequest.onerror = function(){
-
-                    };
-                    ourRequest.send();
-
-
-                    document.getElementById('btnTest').addEventListener('click',function () {
-                        document.getElementById('ishara').textContent = responseData;
-                    });
-                </script>
                 <a href="{{ path('register') }}" class="btn btn-success btn-lg">Signup Now</a>
             </div>
         </div>
