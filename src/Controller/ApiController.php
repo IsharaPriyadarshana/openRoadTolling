@@ -92,7 +92,7 @@ class ApiController extends AbstractFOSRestController
                     }else{
                         $message = json_encode(["balance" => '0']);
                     }
-                    return new RES($message,RES::HTTP_ACCEPTED);
+                    return new RES($message,RES::OK);
                 }
 
 
